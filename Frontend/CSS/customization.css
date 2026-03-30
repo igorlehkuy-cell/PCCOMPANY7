@@ -1,0 +1,290 @@
+/* Customization Page Styles based on design mockup */
+.customization-main {
+    min-height: 80vh;
+    padding: 40px 0;
+    background-color: #fafafa;
+}
+
+.page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #c0c0c0;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Top Section */
+.customization-top-section {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.customization-left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* Games Section */
+.games-section h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: #222;
+}
+
+.games-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.game-box {
+    width: 60px;
+    height: 60px;
+    background-color: #e0e0e0;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    padding: 2px;
+    border: 3px solid transparent;
+}
+
+.game-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.game-box.active {
+    border-color: #333;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* FPS Section */
+.fps-section {
+    position: relative;
+    max-width: 300px;
+}
+
+.fps-section h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 5px;
+    color: #222;
+}
+
+.fps-slider {
+    width: 100%;
+    margin-bottom: 10px;
+    accent-color: var(--dark-brown, #654321);
+}
+
+.slider-label {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* Recommended Box */
+.recommended-box {
+    border: 1px solid #999;
+    padding: 15px;
+    height: 100%;
+    min-height: 250px;
+    max-width: 350px;
+    background-color: #fff;
+}
+
+.recommended-box h3 {
+    font-size: 11px;
+    font-weight: 400;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.recommended-box p {
+    font-size: 12px;
+    color: #555;
+}
+
+/* Right Panel */
+.customization-right-panel {
+    flex: 1.2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pc-image {
+    max-width: 100%;
+    height: auto;
+    max-height: 550px;
+    object-fit: contain;
+}
+
+/* Bottom Section */
+.customization-bottom-section {
+    border-top: 1px solid #ddd;
+    padding-top: 40px;
+}
+
+.section-subtitle {
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #222;
+}
+
+.components-grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-bottom: 40px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.component-column {
+    border: 1px solid #777;
+    background-color: #fff;
+    padding: 30px 20px;
+    height: 100%;
+    min-height: 400px;
+}
+
+.component-column h3 {
+    font-size: 15px;
+    font-weight: 500;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.component-item {
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+    color: #111;
+}
+
+.spec-group {
+    margin-bottom: 30px;
+}
+
+.spec-group strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #222;
+}
+
+.spec-group ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.spec-group li {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #111;
+}
+
+/* Action Button Container */
+.action-btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.add-to-cart-btn {
+    background-color: #e5e933;
+    /* vibrant yellow-green */
+    color: #000;
+    border: none;
+    padding: 18px 80px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #d1d52d;
+    transform: translateY(-2px);
+}
+
+.add-to-cart-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 992px) {
+    .components-grid-container {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .customization-top-section {
+        flex-direction: column;
+    }
+
+    .fps-section,
+    .recommended-box {
+        max-width: 100%;
+    }
+
+    .components-grid-container {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+    }
+
+    .component-column {
+        height: auto;
+        min-height: 200px;
+    }
+}
+
+/* Hover and Selection Styles */
+.component-list,
+.sub-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.component-list li {
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.component-list li:hover:not(.selected-item):not(.recommended-li) {
+    background-color: rgba(101, 67, 33, 0.1);
+    color: var(--dark-brown, #654321);
+    border-color: rgba(101, 67, 33, 0.3);
+}
+
+.selected-item {
+    background-color: var(--dark-brown, #654321);
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
