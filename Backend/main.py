@@ -1,7 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
+import os
 
 from . import models, schemas
 from .database import engine, get_db
@@ -67,6 +70,11 @@ origins = [
     "http://localhost:4200",
     "http://127.0.0.1:4200",
     "null",  # for file:// protocol
+    # Production hosting
+    "https://*.netlify.app",
+    "https://*.onrender.com",
+    "https://*.vercel.app",
+    "https://*.surge.sh",
 ]
 
 app.add_middleware(
@@ -406,3 +414,24 @@ def checkout_bonus(data: schemas.CheckoutBonusRequest, db: Session = Depends(get
         earned_points=earned,
         new_balance=current_user.bonus_points
     )
+
+
+# ── Serve Frontend static files ──────────────────────────────────────────────
+# Визначаємо шлях до папки Frontend відносно кореня проекту
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend")
+
+if os.path.isdir(FRONTEND_DIR):
+    # Статичні ресурси (CSS, JS, images)
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
+    # Маршрути для HTML сторінок
+    @app.get("/", response_class=FileResponse)
+    async def serve_index():
+        return os.path.join(FRONTEND_DIR, "html", "index.html")
+
+    @app.get("/{page}.html", response_class=FileResponse)
+    async def serve_page(page: str):
+        html_path = os.path.join(FRONTEND_DIR, "html", f"{page}.html")
+        if os.path.isfile(html_path):
+            return html_path
+        return os.path.join(FRONTEND_DIR, "html", "index.html")
