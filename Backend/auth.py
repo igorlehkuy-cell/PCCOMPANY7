@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta, timezone
 import jwt
 import bcrypt
+import os
 
-SECRET_KEY = "super-secret-key-for-pc-company-change-in-production"
+SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key-for-pc-company-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
