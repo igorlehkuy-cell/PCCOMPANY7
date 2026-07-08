@@ -128,7 +128,11 @@ def check_admin(current_user: models.User = Depends(get_current_user)):
 
 @app.get("/")
 def read_root():
+    html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend", "html", "index.html")
+    if os.path.isfile(html_path):
+        return FileResponse(html_path)
     return {"message": "Welcome to PC Company API. Go to /docs for Swagger UI."}
+
 
 @app.get("/api/products", response_model=List[schemas.ProductResponse])
 def get_products(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
