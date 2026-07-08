@@ -13,8 +13,9 @@
 
 .checkout-form {
     background-color: var(--white);
-    border-radius: 8px;
-    padding: 30px;
+    border-radius: 20px;
+    padding: 36px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
 }
 
 .form-section {
@@ -182,27 +183,34 @@
 
 .btn-submit {
     width: 100%;
-    padding: 14px;
-    background-color: var(--dark-brown);
+    padding: 16px;
+    background: linear-gradient(135deg, var(--light-brown) 0%, var(--primary-brown) 100%);
     color: var(--white);
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     margin-top: 20px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
+    letter-spacing: 0.3px;
 }
 
 .btn-submit:hover {
-    background-color: var(--primary-brown);
+    background: linear-gradient(135deg, var(--primary-brown) 0%, var(--dark-brown) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(139, 69, 19, 0.45);
 }
 
 .order-summary {
     background-color: var(--white);
-    border-radius: 8px;
+    border-radius: 20px;
     height: fit-content;
     position: sticky;
     top: 120px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
 }
 
 .summary-divider {
@@ -235,8 +243,11 @@
 .payment-modal {
     display: none;
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
     z-index: 2000;
     align-items: center;
     justify-content: center;
@@ -244,11 +255,12 @@
 
 .payment-modal-content {
     background: var(--white);
-    border-radius: 8px;
+    border-radius: 20px;
     width: 90%;
     max-width: 500px;
-    padding: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 32px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .payment-modal-header {
@@ -260,20 +272,106 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-.payment-modal-header h2 { 
-    margin: 0; 
-    font-size: 20px; 
+.payment-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
     color: var(--text-dark);
 }
 
 .payment-modal-close {
-    background: none; 
-    border: none; 
-    font-size: 24px; 
-    cursor: pointer; 
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
     color: #555;
 }
 
 .payment-modal-close:hover {
     color: var(--dark-brown);
+}
+
+/* ===========================
+   DARK THEME - Checkout
+   =========================== */
+[data-theme="dark"] .checkout-page {
+    background-color: #121212;
+}
+
+[data-theme="dark"] .checkout-form,
+[data-theme="dark"] .order-summary,
+[data-theme="dark"] .summary-box,
+[data-theme="dark"] .map-container,
+[data-theme="dark"] .payment-modal-content {
+    background-color: #1e1e2e;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .form-section h2,
+[data-theme="dark"] .order-summary h2,
+[data-theme="dark"] .map-container h2,
+[data-theme="dark"] .payment-modal-header h2,
+[data-theme="dark"] .location-name,
+[data-theme="dark"] .payment-name {
+    color: #f0f0f0;
+}
+
+[data-theme="dark"] .form-group label {
+    color: #ccc;
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .location-option label,
+[data-theme="dark"] .payment-option label,
+[data-theme="dark"] .info-box {
+    background-color: #2a2a3a;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .location-price,
+[data-theme="dark"] .payment-desc,
+[data-theme="dark"] .checkbox-group a {
+    color: #e0ac83;
+    /* Light brown for readability */
+}
+
+[data-theme="dark"] .checkbox-group a:hover {
+    color: #f5deb3;
+}
+
+[data-theme="dark"] .form-group input:focus {
+    background-color: #333;
+}
+
+[data-theme="dark"] .location-option input:checked+label,
+[data-theme="dark"] .payment-option input:checked+label {
+    background-color: rgba(139, 69, 19, 0.2);
+    border-color: #8B4513;
+}
+
+[data-theme="dark"] .selected-branch-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #444;
+}
+
+[data-theme="dark"] .summary-divider,
+[data-theme="dark"] .form-section,
+[data-theme="dark"] .payment-modal-header {
+    border-color: #333;
+}
+
+[data-theme="dark"] #delivery-map {
+    border-color: #444;
+}
+
+[data-theme="dark"] .info-box {
+    background: #252535 !important;
+}
+
+[data-theme="dark"] .payment-modal-close {
+    color: #aaa;
+}
+
+[data-theme="dark"] .payment-modal-close:hover {
+    color: #fff;
 }

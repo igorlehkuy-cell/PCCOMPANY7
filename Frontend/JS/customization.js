@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let cart = JSON.parse(localStorage.getItem('pc-company-cart')) || [];
                 cart.push({id: customId, name: fullName, price: currentPrice, type, quantity: 1});
                 localStorage.setItem('pc-company-cart', JSON.stringify(cart));
-                alert(`${fullName} додано до кошика!`);
+                window.showToast(`${fullName} додано до кошика!`, 'success');
             }
         });
     }

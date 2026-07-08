@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-company-theme') || 'light');</script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="auth-body">
     <div class="auth-container">
         <div class="auth-box">
@@ -21,59 +24,29 @@
             <form class="auth-form" id="registerForm">
                 <div class="form-group">
                     <label for="name">Ім'я</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Введіть ваше ім'я"
-                        required
-                    >
+                    <input type="text" id="name" name="name" placeholder="Введіть ваше ім'я" required>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Електронна пошта</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="Введіть вашу електронну пошту"
-                        required
-                    >
+                    <input type="email" id="email" name="email" placeholder="Введіть вашу електронну пошту" required>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Номер телефону</label>
-                    <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        placeholder="+38 (0__) ___ __ __"
-                        required
-                    >
+                    <input type="tel" id="phone" name="phone" placeholder="+38 (0__) ___ __ __" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Пароль</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Введіть пароль (мінімум 6 символів)"
-                        minlength="6"
-                        required
-                    >
+                    <input type="password" id="password" name="password"
+                        placeholder="Введіть пароль (мінімум 6 символів)" minlength="6" required>
                 </div>
 
                 <div class="form-group">
                     <label for="confirm-password">Повторіть пароль</label>
-                    <input
-                        type="password"
-                        id="confirm-password"
-                        name="confirm-password"
-                        placeholder="Повторіть пароль"
-                        minlength="6"
-                        required
-                    >
+                    <input type="password" id="confirm-password" name="confirm-password" placeholder="Повторіть пароль"
+                        minlength="6" required>
                 </div>
 
                 <div class="form-agree">
@@ -91,76 +64,83 @@
         </div>
     </div>
 
+    <script src="../JS/toast.js"></script>
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function () {
+            const registerForm = document.getElementById('registerForm');
 
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            const phone = document.getElementById('phone').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const agree = document.getElementById('agree').checked;
-
-            console.log('Registration attempt:', { name, email, phone });
-
-            // Перевірка згоди з умовами
-            if (!agree) {
-                alert('Ви повинні згодитись з умовами та політикою приватності');
+            if (!registerForm) {
+                console.error('Registration form not found!');
                 return;
             }
 
-            // Перевірка на пусті поля
-            if (!name || !email || !phone || !password) {
-                alert('Будь ласка, заповніть всі поля!');
-                return;
-            }
+            registerForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
 
-            // Перевірка паролю
-            if (password !== confirmPassword) {
-                alert('Паролі не співпадають!');
-                return;
-            }
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim().toLowerCase();
+                const phone = document.getElementById('phone').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                const agree = document.getElementById('agree').checked;
 
-            // Перевірка довжини пароля
-            if (password.length < 6) {
-                alert('Пароль повинен бути мінімум 6 символів!');
-                return;
-            }
+                if (!agree) {
+                    window.showToast('Ви повинні згодитись з умовами та політикою приватності', 'warning');
+                    return;
+                }
 
-            // Перевірка формату email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Будь ласка, введіть корректну електронну пошту!');
-                return;
-            }
+                if (!name || !email || !phone || !password) {
+                    window.showToast('Будь ласка, заповніть всі поля!', 'warning');
+                    return;
+                }
 
-            try {
-                // Зберігаємо дані користувача
-                const userData = {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    password: password,
-                    registeredAt: new Date().toISOString()
-                };
+                if (password !== confirmPassword) {
+                    window.showToast('Пароль не співпадає!', 'error');
+                    return;
+                }
 
-                console.log('Saving user data:', userData);
-                localStorage.setItem('pc-company-user', JSON.stringify(userData));
-                localStorage.setItem('pc-company-logged-in', 'false');
-                console.log('User data saved successfully');
+                if (password.length < 6) {
+                    window.showToast('Пароль повинен бути мінімум 6 символів!', 'warning');
+                    return;
+                }
 
-                alert('✅ Реєстрація успішна! Тепер увійдіть у свій аккаунт.');
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 500);
-            } catch (error) {
-                alert('⚠️ Помилка при реєстрації. Спробуйте ще раз.');
-                console.error('Registration error:', error);
-            }
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    window.showToast('Будь ласка, введіть коректну електронну пошту!', 'warning');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/api/users', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, phone, password })
+                    });
+
+                    if (response.ok) {
+                        const userData = await response.json();
+                        // Зберігаємо дані користувача локально для UI
+                        localStorage.setItem('pc-company-user', JSON.stringify({
+                            name: userData.name,
+                            email: userData.email,
+                            phone: userData.phone,
+                            avatar: '../images/avatars/preset_1.svg'
+                        }));
+                        localStorage.setItem('pc-company-logged-in', 'false');
+
+                        window.showToast('✅ Реєстрація успішна! Тепер ви можете увійти.', 'success');
+                        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+                    } else {
+                        const err = await response.json();
+                        window.showToast('❌ ' + (err.detail || 'Помилка реєстрації'), 'error');
+                    }
+                } catch (error) {
+                    window.showToast('⚠️ Сервер недоступний. Переконайтеся, що бекенд запущений.', 'error');
+                    console.error('Registration error:', error);
+                }
+            });
         });
     </script>
 </body>
+
 </html>
-
-

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-company-theme') || 'light');</script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header" id="header">
@@ -18,31 +21,42 @@
                 <a href="index.html" class="logo">PC◗Company</a>
                 <nav class="nav">
                     <a href="index.html" class="nav-link">Головна</a>
-                    <a href="index.html#about" class="nav-link">Про нас</a>
                     <a href="rental.html" class="nav-link">Оренда</a>
-                    <a href="customization.html" class="nav-link">Кастомізація</a>
+                    <a href="index.html#about" class="nav-link">Про нас</a>
                     <a href="index.html#buyers" class="nav-link">Покупцям</a>
                 </nav>
                 <div class="header-right">
+                    <div class="auth-links">
+                        <a href="login.html" class="auth-link login-link">Вхід</a>
+                        <a href="register.html" class="auth-link register-link">Реєстрація</a>
+                    </div>
                     <div class="social-icons">
                         <a href="#" class="social-icon" aria-label="Instagram">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
                             </svg>
                         </a>
                         <a href="#" class="social-icon" aria-label="Facebook">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                <path
+                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                             </svg>
                         </a>
                         <a href="#" class="social-icon" aria-label="YouTube">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                <path
+                                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                             </svg>
                         </a>
                     </div>
+                    <label class="theme-toggle" title="Змінити тему" id="themeToggle">
+                        <input type="checkbox" id="themeCheckbox">
+                        <span class="theme-slider"></span>
+                    </label>
                     <button class="cart-btn" aria-label="Кошик">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <circle cx="9" cy="21" r="1"></circle>
                             <circle cx="20" cy="21" r="1"></circle>
                             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -56,7 +70,7 @@
     <main class="customization-main">
         <div class="container">
             <h1 class="page-title">КАСТОМІЗАЦІЯ</h1>
-            
+
             <div class="customization-top-section">
                 <div class="customization-left-panel">
                     <div class="games-section">
@@ -65,26 +79,27 @@
                             <!-- JS will populate this -->
                         </div>
                     </div>
-                    
+
                     <div class="fps-section">
                         <h3>Бажаний fps</h3>
                         <input type="range" class="fps-slider" id="fpsSlider" min="30" max="240" step="30" value="60">
                         <p class="slider-label" id="fpsLabel">60 FPS</p>
                     </div>
-                    
+
                     <div class="recommended-box">
                         <h3>Рекомендаційні налаштування та складові ПК</h3>
                         <p id="recommendedText">Оберіть гру для отримання рекомендацій</p>
                     </div>
                 </div>
                 <div class="customization-right-panel">
-                    <img src="../images/slide2.png" alt="PC Image" class="pc-image" id="customPcImage" onerror="this.src='https://placehold.co/400x500/eee/999?text=PC+Tower';">
+                    <img src="../images/slide2.png" alt="PC Image" class="pc-image" id="customPcImage"
+                        onerror="this.src='https://placehold.co/400x500/eee/999?text=PC+Tower';">
                 </div>
             </div>
-            
+
             <div class="customization-bottom-section">
                 <h2 class="section-subtitle">Складіть ПК самі!</h2>
-                
+
                 <div class="components-grid-container">
                     <div class="component-column">
                         <h3>ПРОЦЕСОРИ</h3>
@@ -130,7 +145,7 @@
                             </ul>
                         </div>
                     </div>
-                    
+
                     <div class="component-column">
                         <h3>ВІДЕОКАРТИ</h3>
                         <div class="component-options">
@@ -170,7 +185,7 @@
                                         <li>RTX 4080 TI</li>
                                         <li>RTX 4080 SUPER</li>
                                     </ul>
-                                        <li>Radeon RX 7600</li>
+                                <li>Radeon RX 7600</li>
                                 <li>Radeon RX 7900 XTX</li>
                             </ul>
                         </div>
@@ -187,7 +202,7 @@
                             </ul>
                         </div>
                     </div>
-                    
+
                     <div class="component-column">
                         <h3>ОХОЛОДЖЕННЯ</h3>
                         <div class="component-options">
@@ -240,7 +255,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="action-btn-container" style="flex-direction: column; align-items: center; gap: 15px;">
                     <div style="font-size: 24px; font-weight: 700; color: var(--dark-brown);">
                         Разом: <span id="customPriceDisplay">$0</span>
@@ -255,11 +270,17 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2026 PC Company. Всі права захищені.</p>
+            <nav class="nav" style="justify-content:center; margin-top:8px;">
+                <a href="news.html" class="nav-link">📃 Новини</a>
+            </nav>
         </div>
     </footer>
 
     <script src="../JS/script.js"></script>
     <script src="../JS/customization.js"></script>
+    <script src="../JS/toast.js"></script>
 </body>
+
 </html>
 
+</html>

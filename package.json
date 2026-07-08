@@ -4,6 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "run_server.bat",
+    "backend": "venv\\Scripts\\uvicorn Backend.main:app --reload",
+    "backend:setup": "python -m venv venv && venv\\Scripts\\pip install -r Backend\\requirements.txt",
+    "backend:install": "venv\\Scripts\\pip install -r Backend\\requirements.txt",
+    "backend:global": "uvicorn Backend.main:app --reload",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": true

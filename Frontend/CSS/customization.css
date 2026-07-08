@@ -2,7 +2,7 @@
 .customization-main {
     min-height: 80vh;
     padding: 40px 0;
-    background-color: #fafafa;
+    background-color: var(--bg-light);
 }
 
 .page-title {
@@ -45,29 +45,33 @@
 .game-box {
     width: 60px;
     height: 60px;
-    background-color: #e0e0e0;
+    background-color: var(--white);
     cursor: pointer;
-    border-radius: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: var(--radius);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 600;
     text-align: center;
     padding: 2px;
-    border: 3px solid transparent;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .game-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-brown);
 }
 
 .game-box.active {
-    border-color: #333;
+    border: 2px solid var(--primary-brown);
     transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-md);
 }
 
 /* FPS Section */
@@ -97,14 +101,16 @@
     margin-top: 5px;
 }
 
-/* Recommended Box */
 .recommended-box {
-    border: 1px solid #999;
-    padding: 15px;
+    border: none;
+    border-radius: 20px;
+    padding: 25px;
     height: 100%;
     min-height: 250px;
     max-width: 350px;
-    background-color: #fff;
+    background-color: var(--white);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
 }
 
 .recommended-box h3 {
@@ -159,11 +165,20 @@
 }
 
 .component-column {
-    border: 1px solid #777;
-    background-color: #fff;
+    border: none;
+    border-radius: 20px;
+    background-color: var(--white);
     padding: 30px 20px;
     height: 100%;
     min-height: 400px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+}
+
+.component-column:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
 }
 
 .component-column h3 {
@@ -213,24 +228,28 @@
 }
 
 .add-to-cart-btn {
-    background-color: #e5e933;
-    /* vibrant yellow-green */
-    color: #000;
+    background: linear-gradient(135deg, var(--light-brown) 0%, var(--primary-brown) 100%);
+    color: var(--white);
     border: none;
+    border-radius: 16px;
     padding: 18px 80px;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 24px rgba(139, 69, 19, 0.3);
+    letter-spacing: 0.3px;
 }
 
 .add-to-cart-btn:hover {
-    background-color: #d1d52d;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--primary-brown) 0%, var(--dark-brown) 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(139, 69, 19, 0.45);
 }
 
 .add-to-cart-btn:active {
     transform: translateY(0);
+    box-shadow: var(--shadow-sm);
 }
 
 @media (max-width: 992px) {
@@ -287,4 +306,144 @@
     color: #fff !important;
     font-weight: 600;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.customization-top-section {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.customization-bottom-section {
+    opacity: 0;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+.component-column {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.component-column:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+@keyframes pulse-shadow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(229, 233, 51, 0.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(229, 233, 51, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(229, 233, 51, 0);
+    }
+}
+
+.add-to-cart-btn {
+    animation: none;
+}
+
+.add-to-cart-btn:hover {
+    animation: none;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sub-list {
+    animation: fadeInSlide 0.3s ease-out;
+}
+
+.parent-title {
+    transition: color 0.2s;
+}
+
+.parent-title:hover {
+    color: var(--dark-brown, #654321);
+}
+
+/* ===========================
+   DARK THEME - Customization
+   =========================== */
+[data-theme="dark"] .customization-main {
+    background-color: #121212;
+}
+
+[data-theme="dark"] .page-title {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .games-section h3,
+[data-theme="dark"] .fps-section h3,
+[data-theme="dark"] .section-subtitle,
+[data-theme="dark"] .component-column h3,
+[data-theme="dark"] .spec-group strong {
+    color: #f0f0f0;
+}
+
+[data-theme="dark"] .fps-section h3 {
+    border-color: #444;
+}
+
+[data-theme="dark"] .recommended-box,
+[data-theme="dark"] .component-column {
+    background-color: #1e1e2e;
+    border: 1px solid #2a2a3a;
+}
+
+[data-theme="dark"] .recommended-box h3,
+[data-theme="dark"] .recommended-box p,
+[data-theme="dark"] .slider-label,
+[data-theme="dark"] .component-list li,
+[data-theme="dark"] .spec-group li {
+    color: #ccc;
+}
+
+[data-theme="dark"] .customization-bottom-section {
+    border-color: #333;
+}
+
+[data-theme="dark"] .component-list li:hover:not(.selected-item):not(.recommended-li) {
+    background-color: rgba(139, 69, 19, 0.2);
+    color: #fff;
+    border-color: #8B4513;
+}
+
+[data-theme="dark"] .game-box {
+    background-color: #1e1e2e;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] #customPriceDisplay {
+    color: #e0ac83; /* Lighter brown for dark mode */
+}
+
+[data-theme="dark"] .parent-title:hover {
+    color: #e0ac83;
+}
+[data-theme="dark"] .parent-title {
+    color: #e0e0e0;
 }

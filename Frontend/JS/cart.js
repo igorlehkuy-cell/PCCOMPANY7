@@ -117,7 +117,25 @@ function removeFromCart(productId) {
 function updateCartSummary() {
     const subtotal = cart.getTotal();
     const shipping = cart.items.length > 0 ? 50 : 0;
-    const total = subtotal + shipping;
+    let discountPercent = 0;
+    
+    // Check for promo
+    const promo = localStorage.getItem('pc-company-promo');
+    if (promo) {
+        discountPercent += parseInt(promo);
+    }
+    
+    // Check for quiz discount
+    const quizDiscount = localStorage.getItem('quiz_discount');
+    if (quizDiscount) {
+        discountPercent += parseInt(quizDiscount);
+    }
+    
+    // Limit discount to 100%
+    discountPercent = Math.min(discountPercent, 100);
+    
+    const discountAmount = Math.round((subtotal * discountPercent) / 100);
+    const total = subtotal - discountAmount + shipping;
 
     const subtotalElem = document.getElementById('subtotal');
     const shippingElem = document.getElementById('shipping');
@@ -125,6 +143,32 @@ function updateCartSummary() {
 
     if (subtotalElem) subtotalElem.textContent = `${subtotal} грн`;
     if (shippingElem) shippingElem.textContent = `${shipping} грн`;
+    
+    // Check if we have discount elements, if not create them if discount > 0
+    let discountElem = document.getElementById('discount');
+    if (discountPercent > 0) {
+        if (!discountElem) {
+            const summaryContainer = document.querySelector('.cart-modal-summary') || document.querySelector('.summary-box');
+            if (summaryContainer) {
+                const discountRow = document.createElement('div');
+                discountRow.className = 'cart-summary-row discount-row summary-row';
+                discountRow.innerHTML = `<span>Знижка (-${discountPercent}%):</span><span id="discount" style="color: var(--red);">-${discountAmount} грн</span>`;
+                // Insert before the total row
+                const totalRow = summaryContainer.querySelector('.cart-summary-row.total') || summaryContainer.querySelector('.summary-row.total');
+                if (totalRow) {
+                    summaryContainer.insertBefore(discountRow, totalRow);
+                } else {
+                    summaryContainer.appendChild(discountRow);
+                }
+            }
+        } else {
+            discountElem.textContent = `-${discountAmount} грн`;
+            discountElem.parentElement.querySelector('span').textContent = `Знижка (-${discountPercent}%):`;
+        }
+    } else if (discountElem) {
+        discountElem.parentElement.remove();
+    }
+
     if (totalElem) totalElem.textContent = `${total} грн`;
 }
 
@@ -133,7 +177,7 @@ const checkoutBtn = document.getElementById('checkoutBtn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
         if (cart.items.length === 0) {
-            alert('Кошик порожній!');
+            window.showToast('Кошик порожній!', 'warning');
             return;
         }
         window.location.href = 'checkout.html';
@@ -148,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Add to cart function (called from product pages)
 function addToCart(product) {
     cart.addItem(product);
-    alert(`${product.name} додано до кошика!`);
+    window.showToast(`${product.name} додано до кошика!`, 'success');
 }
 
 

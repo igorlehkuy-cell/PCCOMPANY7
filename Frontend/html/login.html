@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="uk">
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pc-company-theme') || 'light');</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,9 +59,8 @@
 
     <script>
         // Обробник форми входу
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
-            console.log('Form submitted');
 
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
@@ -70,58 +70,66 @@
             const password = passwordInput.value;
             const remember = rememberCheckbox.checked;
 
-            console.log('Email:', email);
-            console.log('Password:', password);
-
             // Валідація полів
             if (!email || !password) {
-                alert('Будь ласка, заповніть всі поля!');
-                return;
-            }
-
-            // Отримуємо дані реєстрації
-            const userData = localStorage.getItem('pc-company-user');
-            console.log('User data from storage:', userData);
-
-            if (!userData) {
-                alert('Спочатку потрібно зареєструватися!');
-                window.location.href = 'register.html';
+                window.showToast('Будь ласка, заповніть всі поля!', 'warning');
                 return;
             }
 
             try {
-                const user = JSON.parse(userData);
-                console.log('Parsed user:', user);
-                console.log('Comparing:', user.email, '===', email);
+                // Відправляємо запит на бекенд (OAuth2 form format)
+                const formData = new URLSearchParams();
+                formData.append('username', email);
+                formData.append('password', password);
 
-                // Перевірка email та password
-                if (user.email === email && user.password === password) {
-                    console.log('Login successful!');
+                const response = await fetch('http://127.0.0.1:8000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
 
-                    // Зберігаємо інформацію про вхід
+                if (response.ok) {
+                    const tokenData = await response.json();
+
+                    // Зберігаємо токен
+                    localStorage.setItem('pc-company-token', tokenData.access_token);
                     localStorage.setItem('pc-company-logged-in', 'true');
-                    localStorage.setItem('pc-company-current-user', JSON.stringify(user));
 
-                    // Якщо користувач вибрав "Запам'ятати мене"
+                    // Отримуємо актуальні дані користувача з бекенду
+                    try {
+                        const userResponse = await fetch('http://127.0.0.1:8000/api/users/me', {
+                            headers: { 'Authorization': 'Bearer ' + tokenData.access_token }
+                        });
+                        if (userResponse.ok) {
+                            const userData = await userResponse.json();
+                            localStorage.setItem('pc-company-current-user', JSON.stringify(userData));
+                            localStorage.setItem('pc-company-user', JSON.stringify(userData));
+                        } else {
+                            throw new Error();
+                        }
+                    } catch (err) {
+                        // Резервний варіант з localStorage
+                        const savedUser = localStorage.getItem('pc-company-user');
+                        if (savedUser) {
+                            localStorage.setItem('pc-company-current-user', savedUser);
+                        }
+                    }
+
                     if (remember) {
                         localStorage.setItem('pc-company-remember', 'true');
                     } else {
                         localStorage.removeItem('pc-company-remember');
                     }
 
-                    // Показуємо повідомлення про успіх
-                    alert('Вхід успішний! 👋');
-
-                    // Перенаправляємо на головну сторінку
-                    window.location.href = 'index.html';
+                    window.showToast('Вхід успішний! 👋', 'success');
+                    setTimeout(() => window.location.href = 'index.html', 1500);
                 } else {
-                    console.log('Invalid credentials');
-                    alert('❌ Невірний email або пароль!');
-                    // Очищаємо поле пароля для безпеки
+                    const err = await response.json();
+                    window.showToast('❌ ' + (err.detail || 'Невірний email або пароль!'), 'error');
                     passwordInput.value = '';
                 }
             } catch (error) {
-                alert('⚠️ Помилка при обробці даних. Спробуйте повторити.');
+                window.showToast('⚠️ Сервер недоступний. Переконайтеся, що бекенд запущений.', 'error');
                 console.error('Login error:', error);
             }
         }
@@ -130,9 +138,6 @@
         const loginForm = document.getElementById('loginForm');
         if (loginForm) {
             loginForm.addEventListener('submit', handleLogin);
-            console.log('Login form listener attached');
-        } else {
-            console.error('Login form not found!');
         }
 
         // Автозаповнення при навантаженні сторінки (якщо була опція "Запам'ятати мене")
@@ -153,5 +158,6 @@
             }
         });
     </script>
+    <script src="../JS/toast.js"></script>
 </body>
 </html>
