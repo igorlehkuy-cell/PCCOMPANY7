@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('pc-company-token');
             if (token) {
                 try {
-                    const bonusResponse = await fetch('http://127.0.0.1:8000/api/users/me/checkout_bonus', {
+                    const bonusResponse = await fetch('https://pccompanyback.onrender.com/api/users/me/checkout_bonus', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

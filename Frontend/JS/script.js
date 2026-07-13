@@ -46,7 +46,7 @@ let products = [
 
 async function fetchProducts() {
     try {
-        const res = await fetch('http://127.0.0.1:8000/api/products');
+        const res = await fetch('https://pccompanyback.onrender.com/api/products');
         if (res.ok) {
             const dbProducts = await res.json();
             if (dbProducts.length > 0) {
