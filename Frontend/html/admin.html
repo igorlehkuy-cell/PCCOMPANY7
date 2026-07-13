@@ -15,7 +15,7 @@
             window.location.replace('login.html');
         } else {
             document.documentElement.style.display = 'none';
-            fetch('https://pccompanyback.onrender.com/api/users/me', {
+            fetch('http://127.0.0.1:8000/api/users/me', {
                 headers: { 'Authorization': 'Bearer ' + _token }
             }).then(res => {
                 if (res.ok) return res.json();
@@ -544,7 +544,7 @@
     <div id="adminToast"></div>
 
     <script>
-        const API = 'https://pccompanyback.onrender.com';
+        const API = 'http://127.0.0.1:8000';
         let allUsers = [];
         let allProducts = [];
 

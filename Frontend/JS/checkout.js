@@ -1,8 +1,8 @@
 // Checkout functionality
 
 // --- Telegram Bot Configuration ---
-const TELEGRAM_BOT_TOKEN = '8659176041:AAGmAvQylvGPuPPYD72icKhjdYTtcefWgvg';
-const TELEGRAM_CHAT_ID = '2096812186';
+const TELEGRAM_BOT_TOKEN = '8659176041:AAGmAvQylvGPuPPYD72icKhjdYTtcefWgvg'; // Вставте сюди токен вашого бота від @BotFather
+const TELEGRAM_CHAT_ID = '2096812186';     // Вставте сюди ваш Chat ID (можна дізнатися через бота @userinfobot)
 
 async function sendTelegramNotification(order, orderData) {
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
@@ -38,7 +38,7 @@ async function sendTelegramNotification(order, orderData) {
 🛒 <b>Товари:</b>
 ${itemsStr}
 
-💵 <b>Разом до оплати:</b> ${order.total} $
+💵 <b>Разом до оплати:</b> ${order.total} грн
     `;
 
     try {
@@ -67,8 +67,6 @@ class Checkout {
             'Дніпро': 60,
             'Інше': 0
         };
-        this.useBonusPoints = false;
-        this.availableBonus = 0;
     }
 
     loadCart() {
@@ -83,34 +81,6 @@ class Checkout {
         }, 0);
     }
 
-    getDiscountPercent() {
-        let percent = 0;
-        const promo = localStorage.getItem('pc-company-promo');
-        if (promo) {
-            percent += parseInt(promo);
-        }
-        const quizDiscount = localStorage.getItem('quiz_discount');
-        if (quizDiscount) {
-            percent += parseInt(quizDiscount);
-        }
-        return Math.min(percent, 100); // limit to 100%
-    }
-
-    getDiscountAmount() {
-        const subtotal = this.getCartTotal();
-        return Math.round((subtotal * this.getDiscountPercent()) / 100);
-    }
-
-    getBonusDeduction() {
-        if (!this.useBonusPoints) return 0;
-        const subtotal = this.getCartTotal() - this.getDiscountAmount();
-        return Math.min(this.availableBonus, subtotal);
-    }
-
-    getFinalTotal(location) {
-        return this.getCartTotal() - this.getDiscountAmount() - this.getBonusDeduction() + this.getDeliveryPrice(location);
-    }
-
     getDeliveryPrice(location) {
         return this.deliveryPrices[location] || 0;
     }
@@ -121,7 +91,7 @@ class Checkout {
             date: new Date().toISOString(),
             items: this.cart,
             ...orderData,
-            total: this.getFinalTotal(orderData.location)
+            total: this.getCartTotal() + this.getDeliveryPrice(orderData.location)
         };
 
         // Save to localStorage
@@ -129,11 +99,8 @@ class Checkout {
         orders.push(order);
         localStorage.setItem('pc-company-orders', JSON.stringify(orders));
 
-        // Clear cart and discounts after order
+        // Clear cart after order
         localStorage.removeItem('pc-company-cart');
-        localStorage.removeItem('pc-company-promo');
-        localStorage.removeItem('quiz_discount');
-        localStorage.removeItem('quiz_streak');
 
         return order;
     }
@@ -171,25 +138,7 @@ function renderOrderSummary() {
     // Update total
     if (orderTotalElem) {
         const total = checkout.getCartTotal();
-        const discountAmount = checkout.getDiscountAmount();
-        const bonusDeduction = checkout.getBonusDeduction();
-
-        let finalHtml = '';
-        if (discountAmount > 0) {
-            const discountPercent = checkout.getDiscountPercent();
-            finalHtml += `<div style="font-size: 14px; color: var(--red); margin-bottom: 5px;">Знижка (-${discountPercent}%): -${discountAmount} грн</div>`;
-        }
-        if (bonusDeduction > 0) {
-            finalHtml += `<div style="font-size: 14px; color: var(--primary-color); margin-bottom: 5px;">Списано бонусів: -${bonusDeduction} грн</div>`;
-        }
-        
-        // Ensure location is read properly from input if it's already set (from map)
-        const locationInput = document.getElementById('location');
-        const loc = locationInput ? locationInput.value : '';
-        const deliveryPrice = checkout.getDeliveryPrice(loc);
-        
-        finalHtml += `<span>${total - discountAmount - bonusDeduction + deliveryPrice} грн</span>`;
-        orderTotalElem.innerHTML = finalHtml;
+        orderTotalElem.textContent = `${total} грн`;
     }
 }
 
@@ -327,20 +276,9 @@ function initMap() {
         branchNameElem.textContent = isCustom ? `Власна адреса (${city})` : `${city}, ${address}`;
         branchPriceElem.textContent = deliveryPrice === 0 && !isCustom ? 'Безкоштовно' : `${deliveryPrice} грн`;
 
-        const discountAmount = checkout.getDiscountAmount();
-        const bonusDeduction = checkout.getBonusDeduction();
-        const total = checkout.getCartTotal() - discountAmount - bonusDeduction + deliveryPrice;
+        const total = checkout.getCartTotal() + deliveryPrice;
         if (orderTotalElem) {
-            let finalHtml = '';
-            if (discountAmount > 0) {
-                const discountPercent = checkout.getDiscountPercent();
-                finalHtml += `<div style="font-size: 14px; color: var(--red); margin-bottom: 5px;">Знижка (-${discountPercent}%): -${discountAmount} грн</div>`;
-            }
-            if (bonusDeduction > 0) {
-                finalHtml += `<div style="font-size: 14px; color: var(--primary-color); margin-bottom: 5px;">Списано бонусів: -${bonusDeduction} грн</div>`;
-            }
-            finalHtml += `<span>${total} грн</span>`;
-            orderTotalElem.innerHTML = finalHtml;
+            orderTotalElem.textContent = `${total} грн`;
         }
 
         map.closePopup();
@@ -371,12 +309,12 @@ if (checkoutForm) {
 
         // Validate
         if (!pendingOrderData.location) {
-            window.showToast('Виберіть місто/локацію доставки на карті!', 'warning');
+            alert('Виберіть місто/локацію доставки на карті!');
             return;
         }
 
         if (!pendingOrderData.paymentMethod) {
-            window.showToast('Виберіть способ оплати!', 'warning');
+            alert('Виберіть способ оплати!');
             return;
         }
 
@@ -391,24 +329,24 @@ if (checkoutForm) {
 
 function openPaymentModal(method) {
     const modal = document.getElementById('paymentModal');
-    if (!modal) return;
-
+    if(!modal) return;
+    
     // Hide all sub-views
     ['card', 'transfer', 'cash', 'crypto'].forEach(m => {
         const el = document.getElementById(`modal-payment-${m}`);
-        if (el) el.style.display = 'none';
+        if(el) el.style.display = 'none';
     });
 
     // Show active view
     const activeEl = document.getElementById(`modal-payment-${method}`);
-    if (activeEl) activeEl.style.display = 'block';
+    if(activeEl) activeEl.style.display = 'block';
 
     modal.style.display = 'flex';
 }
 
 function closePaymentModal() {
     const modal = document.getElementById('paymentModal');
-    if (modal) {
+    if(modal) {
         modal.style.display = 'none';
     }
 }
@@ -416,7 +354,7 @@ function closePaymentModal() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     if (checkout.cart.length === 0) {
-        window.showToast('Кошик порожній! Повертаємося на головну...', 'warning');
+        alert('Кошик порожній! Повертаємося на головну...');
         window.location.href = 'index.html';
         return;
     }
@@ -427,18 +365,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle payment method toggles
     // Setup modal events
     const modal = document.getElementById('paymentModal');
-    if (modal) {
+    if(modal) {
         document.getElementById('paymentModalCloseBtn').addEventListener('click', closePaymentModal);
-        modal.addEventListener('click', (e) => { if (e.target === modal) closePaymentModal(); });
+        modal.addEventListener('click', (e) => { if(e.target === modal) closePaymentModal(); });
 
         document.getElementById('confirmPaymentBtn').addEventListener('click', async () => {
-            if (!pendingOrderData) return;
-
+            if(!pendingOrderData) return;
+            
             // if card, validate and append to pending order
             if (pendingOrderData.paymentMethod === 'card') {
                 const cardNum = document.getElementById('modalCardNumber').value;
                 if (!cardNum || cardNum.trim() === '') {
-                    window.showToast('Будь ласка, введіть дійсний номер кредитної карти.', 'error');
+                    alert('Будь ласка, введіть дійсний номер кредитної карти.');
                     return;
                 }
                 pendingOrderData.cardNumber = cardNum;
@@ -448,47 +386,18 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmBtn.disabled = true;
             confirmBtn.textContent = 'Обробка...';
 
-            // Save order locally
+            // Save order
             const order = checkout.saveOrder(pendingOrderData);
-
-            // Notify backend about bonus usage/earning if logged in
-            const token = localStorage.getItem('pc-company-token');
-            if (token) {
-                try {
-                    const bonusResponse = await fetch('https://pccompanyback.onrender.com/api/users/me/checkout_bonus', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({
-                            used_bonus_points: checkout.getBonusDeduction(),
-                            order_total: order.total
-                        })
-                    });
-                    if (bonusResponse.ok) {
-                        const bonusData = await bonusResponse.json();
-                        console.log('Bonus updated:', bonusData);
-                        // Update local user data
-                        const currentUserData = JSON.parse(localStorage.getItem('pc-company-current-user') || '{}');
-                        currentUserData.bonus_points = bonusData.new_balance;
-                        localStorage.setItem('pc-company-current-user', JSON.stringify(currentUserData));
-                        localStorage.setItem('pc-company-user', JSON.stringify(currentUserData));
-                    }
-                } catch(e) { console.error('Failed to update bonuses on backend', e); }
-            }
 
             // Send to telegram
             await sendTelegramNotification(order, pendingOrderData);
 
-            window.showToast(`Замовлення успішно оформлено!<br>Номер замовлення: ${order.id}<br>Цей номер надішлемо вам на email ${pendingOrderData.email}`, 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 2500);
+            alert(`Замовлення успішно оформлено!\nНомер замовлення: ${order.id}\nЦей номер надішлемо вам на email ${pendingOrderData.email}`);
+            window.location.href = 'index.html';
         });
     }
 
-    // Pre-fill user data and initialize bonuses if logged in
+    // Pre-fill user data if logged in
     const currentUser = localStorage.getItem('pc-company-current-user');
     if (currentUser) {
         const user = JSON.parse(currentUser);
@@ -499,24 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (nameInput) nameInput.value = user.name || '';
         if (emailInput) emailInput.value = user.email || '';
         if (phoneInput) phoneInput.value = user.phone || '';
-        
-        // Bonus initialization
-        if (user.bonus_points && user.bonus_points > 0) {
-            checkout.availableBonus = user.bonus_points;
-            const bonusBox = document.getElementById('bonusSystemBox');
-            const availablePointsSpan = document.getElementById('availableBonusPoints');
-            const useBonusCheckbox = document.getElementById('useBonusPoints');
-            
-            if (bonusBox && availablePointsSpan && useBonusCheckbox) {
-                bonusBox.style.display = 'block';
-                availablePointsSpan.textContent = user.bonus_points;
-                
-                useBonusCheckbox.addEventListener('change', (e) => {
-                    checkout.useBonusPoints = e.target.checked;
-                    renderOrderSummary();
-                });
-            }
-        }
     }
 });
 
