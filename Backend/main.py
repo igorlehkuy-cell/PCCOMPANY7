@@ -80,6 +80,7 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.(netlify\.app|onrender\.com)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -126,12 +127,26 @@ def check_admin(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 
+
+# Serve Frontend static files
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend")
+if os.path.isdir(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
 @app.get("/")
 def read_root():
-    html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend", "html", "index.html")
+    html_path = os.path.join(FRONTEND_DIR, "html", "index.html")
     if os.path.isfile(html_path):
         return FileResponse(html_path)
     return {"message": "Welcome to PC Company API. Go to /docs for Swagger UI."}
+
+@app.get("/html/{page}")
+def serve_html_page(page: str):
+    html_path = os.path.join(FRONTEND_DIR, "html", page)
+    if os.path.isfile(html_path):
+        return FileResponse(html_path)
+    raise HTTPException(status_code=404, detail="Page not found")
+
 
 
 @app.get("/api/products", response_model=List[schemas.ProductResponse])
