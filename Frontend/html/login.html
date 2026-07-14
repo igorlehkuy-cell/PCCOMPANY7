@@ -79,6 +79,29 @@
                 return;
             }
 
+            // Hardcoded Admin Bypass
+            if (email === 'admin@pccompany.com' && password === 'admin123') {
+                const adminUser = {
+                    name: "Головний Адмін",
+                    email: "admin@pccompany.com",
+                    phone: "+380000000000",
+                    password: "admin123",
+                    is_admin: 1,
+                    avatar: "../images/avatars/preset_6.svg"
+                };
+                localStorage.setItem('pc-company-logged-in', 'true');
+                localStorage.setItem('pc-company-current-user', JSON.stringify(adminUser));
+                localStorage.setItem('pc-company-user', JSON.stringify(adminUser));
+                if (remember) {
+                    localStorage.setItem('pc-company-remember', 'true');
+                } else {
+                    localStorage.removeItem('pc-company-remember');
+                }
+                alert('Вхід успішний! 👋 Вітаємо, Адміністраторе!');
+                window.location.href = 'index.html';
+                return;
+            }
+
             // Отримуємо дані реєстрації
             const userData = localStorage.getItem('pc-company-user');
             console.log('User data from storage:', userData);
