@@ -42,7 +42,7 @@ async function sendTelegramNotification(order, orderData) {
 
 📍 <b>Локація на карті:</b> ${orderData.location}
 🚚 <b>Спосіб доставки:</b> ${deliveryText}
-🏠 <b>Адреса/Відділення:</b> ${orderData.address} ${orderData.apartment ? ' (кв./офіс ' + orderData.apartment + ')' : ''}
+🏠 <b>Місто/Локація:</b> ${orderData.address} ${orderData.branchNumber ? '\n🏢 <b>Номер відділення:</b> ' + orderData.branchNumber : ''} ${orderData.apartment ? '\n🚪 <b>Кв./офіс:</b> ' + orderData.apartment : ''}
 💳 <b>Оплата:</b> ${paymentText}${paymentExtra}
 
 🛒 <b>Товари:</b>
@@ -416,7 +416,8 @@ if (checkoutForm) {
             apartment: formData.get('apartment'),
             postcode: formData.get('postcode'),
             paymentMethod: formData.get('payment'),
-            branchDetails: formData.get('branchDetails')
+            branchDetails: formData.get('branchDetails'),
+            branchNumber: formData.get('branchNumber')
         };
 
         // Validate
@@ -438,6 +439,32 @@ if (checkoutForm) {
         openPaymentModal(pendingOrderData.paymentMethod);
     });
 }
+
+// Dynamic delivery fields visibility
+document.addEventListener('DOMContentLoaded', () => {
+    const deliverySelect = document.getElementById('deliveryMethod');
+    if (deliverySelect) {
+        deliverySelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            const branchGroup = document.getElementById('group-branch');
+            const courierGroup = document.getElementById('group-courier-details');
+            
+            if (['novaposhta', 'ukrposhta', 'meest'].includes(val)) {
+                if(branchGroup) branchGroup.style.display = 'block';
+                if(courierGroup) courierGroup.style.display = 'none';
+            } else if (val === 'courier') {
+                if(branchGroup) branchGroup.style.display = 'none';
+                if(courierGroup) courierGroup.style.display = 'flex';
+            } else { // pickup
+                if(branchGroup) branchGroup.style.display = 'none';
+                if(courierGroup) courierGroup.style.display = 'none';
+            }
+        });
+        
+        // Trigger once to set initial correct state
+        deliverySelect.dispatchEvent(new Event('change'));
+    }
+});
 
 // --- Auth UI (sync header auth state) ---
 function getDefaultAvatarSrc(idx) { return `../images/avatars/preset_${idx}.svg`; }

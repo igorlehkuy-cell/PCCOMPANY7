@@ -150,11 +150,15 @@
                                 <option value="pickup">Самовивіз з магазину</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="address">Вулиця та номер будинку / Відділення</label>
-                            <input type="text" id="address" name="address" placeholder="№ Відділення або Вулиця/Будинок..." required>
+                        <div class="form-group" id="group-address">
+                            <label for="address" id="label-address">Місто / Локація (виберіть на карті)</label>
+                            <input type="text" id="address" name="address" placeholder="Виберіть на карті нижче..." readonly required style="background: rgba(0,0,0,0.2); cursor: pointer;" onclick="document.getElementById('delivery-map').scrollIntoView({behavior: 'smooth'})">
                         </div>
-                        <div class="form-row">
+                        <div class="form-group" id="group-branch" style="display: none;">
+                            <label for="branchNumber">Номер відділення</label>
+                            <input type="text" id="branchNumber" name="branchNumber" placeholder="Наприклад: Відділення №15">
+                        </div>
+                        <div class="form-row" id="group-courier-details">
                             <div class="form-group">
                                 <label for="apartment">Квартира / Офіс</label>
                                 <input type="text" id="apartment" name="apartment">
