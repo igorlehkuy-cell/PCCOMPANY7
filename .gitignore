@@ -26,6 +26,12 @@ build/
 
 # Node
 node_modules/
+Frontend_Static/
+
+# Deploy archives
+*.zip
+render_deploy.zip
+
 
 # OS
 .DS_Store
