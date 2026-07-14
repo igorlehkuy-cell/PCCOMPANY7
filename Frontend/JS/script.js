@@ -265,7 +265,9 @@ function updateCartItemQuantity(index, value){ const cart=JSON.parse(localStorag
 function removeFromCart(index){ if(!confirm('Видалити цей товар з кошика?')) return; const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); cart.splice(index,1); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); alert('✅ Товар видалено з кошика'); }
 function proceedToCheckout(){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); if(cart.length===0){ alert('Кошик пуст! Додайте товари перед оформленням замовлення.'); return; } const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; if(!isLoggedIn){ alert('Будь ласка, спочатку увійдіть до свого аккаунту'); window.location.href='login.html'; return; } closeCartModal(); window.location.href='checkout.html'; }
 
-// --- Auth UI (simple) ---
+// --- Auth UI with avatar (like rental.js) ---
+function getDefaultAvatarSrc(idx) { return `../images/avatars/preset_${idx}.svg`; }
+
 function updateAuthUI() { 
     const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; 
     const currentUser = localStorage.getItem('pc-company-current-user'); 
@@ -274,8 +276,14 @@ function updateAuthUI() {
     
     if(isLoggedIn && currentUser) { 
         try { 
-            const user = JSON.parse(currentUser); 
-            authLinks.innerHTML = `<span class="auth-link welcome-text">Ласкаво просимо, ${user.name}!</span><a href="profile.html" class="auth-link profile-link" id="profileOpenBtn">👤 Профіль</a><button class="auth-link logout-link" id="logoutBtn">Вийти</button>`; 
+            const user = JSON.parse(currentUser);
+            const avatarSrc = user.avatar || getDefaultAvatarSrc(1);
+            authLinks.innerHTML = `
+                <img src="${avatarSrc}" class="header-avatar" alt="Аватар" title="Мій профіль" onerror="this.style.display='none'">
+                <span class="auth-link welcome-text">Вітаємо, ${user.name}!</span>
+                <a href="profile.html" class="auth-link profile-link">👤 Профіль</a>
+                <button class="auth-link logout-link" id="logoutBtn">Вийти</button>
+            `; 
             document.getElementById('logoutBtn').addEventListener('click', logoutUser); 
         } catch(e) { console.error(e); } 
     } else { 
