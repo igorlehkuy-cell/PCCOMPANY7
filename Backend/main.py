@@ -419,16 +419,10 @@ def checkout_bonus(data: schemas.CheckoutBonusRequest, db: Session = Depends(get
 
 
 # ── Serve Frontend static files ──────────────────────────────────────────────
-# Використовуємо Frontend_Static для продакшн деплою на Railway
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend_Static")
-
-# Якщо немає Frontend_Static, fallback на Frontend (для локальної розробки)
-if not os.path.isdir(FRONTEND_DIR):
-    FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend")
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend")
 
 if os.path.isdir(FRONTEND_DIR):
     # Монтуємо CSS, JS, images на правильні URL-шляхи
-    # HTML файли посилаються як ../CSS/... ../JS/... що в браузері стає /CSS/ /JS/
     css_dir = os.path.join(FRONTEND_DIR, "CSS")
     js_dir = os.path.join(FRONTEND_DIR, "JS")
     images_dir = os.path.join(FRONTEND_DIR, "images")
@@ -440,7 +434,6 @@ if os.path.isdir(FRONTEND_DIR):
     if os.path.isdir(images_dir):
         app.mount("/images", StaticFiles(directory=images_dir), name="images")
 
-    # Також монтуємо весь frontend як /static для прямих посилань
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 @app.get("/", response_class=FileResponse)
@@ -457,3 +450,4 @@ async def serve_page(page: str):
         return html_path
     fallback = os.path.join(FRONTEND_DIR, "html", "index.html")
     return fallback
+
