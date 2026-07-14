@@ -48,7 +48,7 @@ async function sendTelegramNotification(order, orderData) {
 🛒 <b>Товари:</b>
 ${itemsStr}
 
-💵💰 <b>Всього до сплати:</b> $${order.total}
+💵💰 <b>Всього до сплати:</b> $${order.total} + ${orderData.deliveryPrice || 0} грн (Доставка)
     `;
 
     try {
@@ -163,6 +163,19 @@ function initMap() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+
+    // Add Geocoder (Search box)
+    if (L.Control.Geocoder) {
+        L.Control.geocoder({
+            defaultMarkGeocode: false,
+            placeholder: 'Шукати адресу...'
+        })
+        .on('markgeocode', function(e) {
+            map.setView(e.geocode.center, 14);
+            map.fireEvent('click', { latlng: e.geocode.center });
+        })
+        .addTo(map);
+    }
 
     const branches = [
         { city: 'Київ', address: 'вул. Хрещатик, 1', lat: 50.4501, lng: 30.5234 },
@@ -363,11 +376,14 @@ function initMap() {
         }
 
         branchNameElem.textContent = isCustom ? `Власна адреса (${city})` : `${city}, ${address}`;
-        branchPriceElem.textContent = deliveryPrice === 0 && !isCustom ? 'Безкоштовно' : `$${deliveryPrice}`;
+        branchPriceElem.textContent = deliveryPrice === 0 && !isCustom ? 'Безкоштовно' : `${deliveryPrice} грн`;
 
-        const total = checkout.getCartTotal() + deliveryPrice;
+        const cartTotal = checkout.getCartTotal();
+        // save delivery price to orderData when confirming
+        window.pendingDeliveryPrice = deliveryPrice;
+
         if (orderTotalElem) {
-            orderTotalElem.textContent = `$${total}`;
+            orderTotalElem.innerHTML = `$${cartTotal} <span style="font-size:14px; font-weight:normal;">+ ${deliveryPrice} грн (Доставка)</span>`;
         }
         
         // Populate the read-only address input
@@ -527,6 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmBtn = document.getElementById('confirmPaymentBtn');
             confirmBtn.disabled = true;
             confirmBtn.textContent = 'Обробка...';
+
+            // add delivery price to pendingOrderData
+            pendingOrderData.deliveryPrice = window.pendingDeliveryPrice || 0;
 
             // Save order
             const order = checkout.saveOrder(pendingOrderData);

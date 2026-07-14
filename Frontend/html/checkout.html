@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../CSS/checkout.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -78,7 +79,7 @@
                         <div class="summary-divider"></div>
                         <div class="summary-row total">
                             <span> Усього:</span>
-                            <span id="orderTotal"> 0 $</span>
+                            <span id="orderTotal" style="white-space: nowrap;">0 $ + 0 грн</span>
                         </div>
                     </div>
 
@@ -297,6 +298,8 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Leaflet Geocoder JS -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src="../JS/toast.js"></script>
     <script src="../JS/checkout.js"></script>
 </body>
