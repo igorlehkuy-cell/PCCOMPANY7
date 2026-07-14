@@ -76,7 +76,7 @@ class Checkout {
 
     getCartTotal() {
         return this.cart.reduce((total, item) => {
-            const price = parseInt(item.price) || 0;
+            const price = parseInt(String(item.price).replace(/[^0-9.]/g, '')) || 0;
             return total + (price * item.quantity);
         }, 0);
     }
@@ -126,7 +126,7 @@ function renderOrderSummary() {
     checkout.cart.forEach(item => {
         const itemElem = document.createElement('div');
         itemElem.className = 'order-item';
-        const price = parseInt(item.price);
+        const price = parseInt(String(item.price).replace(/[^0-9.]/g, '')) || 0;
         const itemTotal = price * item.quantity;
         itemElem.innerHTML = `
             <span>${item.name} x${item.quantity}</span>
