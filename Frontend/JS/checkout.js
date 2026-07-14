@@ -444,4 +444,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// --- Auth UI (sync header auth state) ---
+function getDefaultAvatarSrc(idx) { return `../images/avatars/preset_${idx}.svg`; }
 
+function updateAuthUI() { 
+    const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; 
+    const currentUser = localStorage.getItem('pc-company-current-user'); 
+    const authLinks = document.querySelector('.auth-links'); 
+    if(!authLinks) return; 
+    
+    if(isLoggedIn && currentUser) { 
+        try { 
+            const user = JSON.parse(currentUser); 
+            const avatarSrc = user.avatar || getDefaultAvatarSrc(1);
+            authLinks.innerHTML = `
+                <img src="${avatarSrc}" class="header-avatar" alt="Аватар" title="Мій профіль" onerror="this.style.display='none'">
+                <span class="auth-link welcome-text">Вітаємо, ${user.name}!</span>
+                <a href="profile.html" class="auth-link profile-link">👤 Профіль</a>
+                <button class="auth-link logout-link" id="logoutBtn">Вийти</button>
+            `; 
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser); 
+        } catch(e) { console.error(e); } 
+    } else { 
+        authLinks.innerHTML = `<a href="login.html" class="auth-link login-link">Вхід</a><a href="register.html" class="auth-link register-link">Реєстрація</a>`; 
+    } 
+}
+
+function logoutUser(){ if(!confirm('Ви впевнені, що хочете вийти?')) return; localStorage.setItem('pc-company-logged-in','false'); localStorage.removeItem('pc-company-current-user'); localStorage.removeItem('pc-company-remember'); alert('Ви успішно вийшли з аккаунту'); window.location.href='index.html'; }
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateAuthUI();
+    const themeToggle = document.getElementById('themeCheckbox');
+    if (themeToggle) {
+        themeToggle.checked = localStorage.getItem('pc-company-theme') === 'dark';
+        themeToggle.addEventListener('change', (e) => {
+            const newTheme = e.target.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pc-company-theme', newTheme);
+        });
+    }
+});
