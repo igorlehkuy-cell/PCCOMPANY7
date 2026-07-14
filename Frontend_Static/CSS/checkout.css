@@ -1,0 +1,279 @@
+/* Checkout Page Styles */
+.checkout-page {
+    min-height: 70vh;
+    padding: 40px 0;
+    background-color: var(--bg-light);
+}
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+.checkout-form {
+    background-color: var(--white);
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.form-section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--dark-brown);
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.location-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.location-option {
+    display: flex;
+    align-items: center;
+}
+
+.location-option input {
+    width: auto;
+    margin-right: 12px;
+}
+
+.location-option label {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+.location-option input:checked+label {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-color: var(--green);
+}
+
+.location-name {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.location-price {
+    font-size: 12px;
+    color: var(--primary-brown);
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+}
+
+.payment-option input {
+    width: auto;
+    margin-right: 12px;
+}
+
+.payment-option label {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+}
+
+.payment-option input:checked+label {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-color: var(--green);
+}
+
+.payment-name {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.payment-desc {
+    font-size: 12px;
+    color: var(--primary-brown);
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.checkbox-group input {
+    width: auto;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.checkbox-group label {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.checkbox-group a {
+    color: var(--dark-brown);
+    text-decoration: none;
+}
+
+.checkbox-group a:hover {
+    text-decoration: underline;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--dark-brown);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.btn-submit:hover {
+    background-color: var(--primary-brown);
+}
+
+.order-summary {
+    background-color: var(--white);
+    border-radius: 8px;
+    height: fit-content;
+    position: sticky;
+    top: 120px;
+}
+
+.summary-divider {
+    border-bottom: 1px solid var(--border-color);
+    margin: 15px 0;
+}
+
+.order-item {
+    padding: 10px 0;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .checkout-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .order-summary {
+        position: static;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Payment Modal Styles */
+.payment-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.payment-modal-content {
+    background: var(--white);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.payment-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.payment-modal-header h2 { 
+    margin: 0; 
+    font-size: 20px; 
+    color: var(--text-dark);
+}
+
+.payment-modal-close {
+    background: none; 
+    border: none; 
+    font-size: 24px; 
+    cursor: pointer; 
+    color: #555;
+}
+
+.payment-modal-close:hover {
+    color: var(--dark-brown);
+}

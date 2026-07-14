@@ -1,0 +1,21 @@
+{
+  "name": "PC Company",
+  "short_name": "PC Company",
+  "description": "Магазин комп'ютерів та ноутбуків",
+  "start_url": "./html/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8B4513",
+  "icons": [
+    {
+      "src": "./images/comp.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./images/comp.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

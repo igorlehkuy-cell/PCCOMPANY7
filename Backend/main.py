@@ -128,24 +128,7 @@ def check_admin(current_user: models.User = Depends(get_current_user)):
 
 
 
-# Serve Frontend static files
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend")
-if os.path.isdir(FRONTEND_DIR):
-    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
-@app.get("/")
-def read_root():
-    html_path = os.path.join(FRONTEND_DIR, "html", "index.html")
-    if os.path.isfile(html_path):
-        return FileResponse(html_path)
-    return {"message": "Welcome to PC Company API. Go to /docs for Swagger UI."}
-
-@app.get("/html/{page}")
-def serve_html_page(page: str):
-    html_path = os.path.join(FRONTEND_DIR, "html", page)
-    if os.path.isfile(html_path):
-        return FileResponse(html_path)
-    raise HTTPException(status_code=404, detail="Page not found")
 
 
 
@@ -436,21 +419,41 @@ def checkout_bonus(data: schemas.CheckoutBonusRequest, db: Session = Depends(get
 
 
 # ── Serve Frontend static files ──────────────────────────────────────────────
-# Визначаємо шлях до папки Frontend відносно кореня проекту
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend")
+# Використовуємо Frontend_Static для продакшн деплою на Railway
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend_Static")
+
+# Якщо немає Frontend_Static, fallback на Frontend (для локальної розробки)
+if not os.path.isdir(FRONTEND_DIR):
+    FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Frontend")
 
 if os.path.isdir(FRONTEND_DIR):
-    # Статичні ресурси (CSS, JS, images)
+    # Монтуємо CSS, JS, images на правильні URL-шляхи
+    # HTML файли посилаються як ../CSS/... ../JS/... що в браузері стає /CSS/ /JS/
+    css_dir = os.path.join(FRONTEND_DIR, "CSS")
+    js_dir = os.path.join(FRONTEND_DIR, "JS")
+    images_dir = os.path.join(FRONTEND_DIR, "images")
+
+    if os.path.isdir(css_dir):
+        app.mount("/CSS", StaticFiles(directory=css_dir), name="css")
+    if os.path.isdir(js_dir):
+        app.mount("/JS", StaticFiles(directory=js_dir), name="js")
+    if os.path.isdir(images_dir):
+        app.mount("/images", StaticFiles(directory=images_dir), name="images")
+
+    # Також монтуємо весь frontend як /static для прямих посилань
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
-    # Маршрути для HTML сторінок
-    @app.get("/", response_class=FileResponse)
-    async def serve_index():
-        return os.path.join(FRONTEND_DIR, "html", "index.html")
+@app.get("/", response_class=FileResponse)
+async def serve_index():
+    index_path = os.path.join(FRONTEND_DIR, "html", "index.html")
+    if os.path.isfile(index_path):
+        return index_path
+    return {"message": "PC Company API. See /docs for Swagger UI."}
 
-    @app.get("/{page}.html", response_class=FileResponse)
-    async def serve_page(page: str):
-        html_path = os.path.join(FRONTEND_DIR, "html", f"{page}.html")
-        if os.path.isfile(html_path):
-            return html_path
-        return os.path.join(FRONTEND_DIR, "html", "index.html")
+@app.get("/{page}.html", response_class=FileResponse)
+async def serve_page(page: str):
+    html_path = os.path.join(FRONTEND_DIR, "html", f"{page}.html")
+    if os.path.isfile(html_path):
+        return html_path
+    fallback = os.path.join(FRONTEND_DIR, "html", "index.html")
+    return fallback
