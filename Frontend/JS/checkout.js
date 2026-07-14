@@ -339,6 +339,8 @@ if (checkoutForm) {
 }
 
 // --- Auth UI (sync header auth state) ---
+function getDefaultAvatarSrc(idx) { return `../images/avatars/preset_${idx}.svg`; }
+
 function updateAuthUI() { 
     const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; 
     const currentUser = localStorage.getItem('pc-company-current-user'); 
@@ -347,8 +349,14 @@ function updateAuthUI() {
     
     if(isLoggedIn && currentUser) { 
         try { 
-            const user = JSON.parse(currentUser); 
-            authLinks.innerHTML = `<span class="auth-link welcome-text">Ласкаво просимо, ${user.name}!</span><a href="profile.html" class="auth-link profile-link">👤 Профіль</a><button class="auth-link logout-link" id="logoutBtn">Вийти</button>`; 
+            const user = JSON.parse(currentUser);
+            const avatarSrc = user.avatar || getDefaultAvatarSrc(1);
+            authLinks.innerHTML = `
+                <img src="${avatarSrc}" class="header-avatar" alt="Аватар" onerror="this.style.display='none'">
+                <span class="auth-link welcome-text">Вітаємо, ${user.name}!</span>
+                <a href="profile.html" class="auth-link profile-link">👤 Профіль</a>
+                <button class="auth-link logout-link" id="logoutBtn">Вийти</button>
+            `; 
             document.getElementById('logoutBtn').addEventListener('click', logoutUser); 
         } catch(e) { console.error(e); } 
     } else { 
@@ -356,7 +364,7 @@ function updateAuthUI() {
     } 
 }
 
-function logoutUser(){ if(!confirm('Ви впевнені, що хочете вийти?')) return; localStorage.setItem('pc-company-logged-in','false'); localStorage.removeItem('pc-company-current-user'); localStorage.removeItem('pc-company-remember'); alert('Ви успішно вийшли з аккаунту'); window.location.href='index.html'; }
+function logoutUser(){ if(!confirm('Ви впевнені, що хочете вийти?')) return; localStorage.setItem('pc-company-logged-in','false'); localStorage.removeItem('pc-company-current-user'); localStorage.removeItem('pc-company-remember'); showToast('Ви успішно вийшли з аккаунту', 'success'); setTimeout(() => window.location.href='index.html', 1200); }
 
 document.addEventListener('DOMContentLoaded', () => {
     updateAuthUI();
