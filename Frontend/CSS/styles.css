@@ -1105,10 +1105,22 @@ html {
 
     .header-right {
         margin-left: auto;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
 
     .social-icons {
-        gap: 10px;
+        display: none;
+    }
+    
+    .auth-link.welcome-text {
+        display: none;
+    }
+    
+    .auth-link {
+        padding: 6px 10px;
+        font-size: 12px;
     }
 
     .section-title {
