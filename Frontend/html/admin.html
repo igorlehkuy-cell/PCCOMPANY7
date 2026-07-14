@@ -10,26 +10,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-        const _token = localStorage.getItem('pc-company-token');
-        if (!_token) {
+        const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true';
+        const currentUserStr = localStorage.getItem('pc-company-current-user');
+        
+        if (!isLoggedIn || !currentUserStr) {
             window.location.replace('login.html');
         } else {
-            document.documentElement.style.display = 'none';
-            fetch('http://127.0.0.1:8000/api/users/me', {
-                headers: { 'Authorization': 'Bearer ' + _token }
-            }).then(res => {
-                if (res.ok) return res.json();
-                throw new Error('Unauthorized');
-            }).then(user => {
+            try {
+                const user = JSON.parse(currentUserStr);
                 if (user.is_admin === 1) {
-                    document.documentElement.style.display = '';
+                    // Allowed
                 } else {
                     window.location.replace('index.html');
                 }
-            }).catch(() => {
-                localStorage.removeItem('pc-company-token');
+            } catch (e) {
                 window.location.replace('login.html');
-            });
+            }
         }
     </script>
 </head>
@@ -560,6 +556,8 @@
         // === Auth ===
         function logoutAdmin() {
             localStorage.removeItem('pc-company-token');
+            localStorage.setItem('pc-company-logged-in', 'false');
+            localStorage.removeItem('pc-company-current-user');
             window.location.replace('login.html');
         }
 
