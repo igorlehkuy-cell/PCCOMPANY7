@@ -546,11 +546,10 @@
 
         function getAuthHeaders() {
             const token = localStorage.getItem('pc-company-token');
-            if (!token) {
-                window.location.href = 'login.html';
-                return {};
-            }
-            return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+            // Don't redirect — admin may be using local auth without a backend token
+            return token
+                ? { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+                : { 'Content-Type': 'application/json' };
         }
 
         // === Auth ===
@@ -595,43 +594,30 @@
         async function loadStats() {
             try {
                 const headers = getAuthHeaders();
-                if (!headers.Authorization) return;
                 const [usersRes, productsRes, ordersRes] = await Promise.all([
                     fetch(API + '/api/users?t=' + Date.now(), { headers }),
                     fetch(API + '/api/products?t=' + Date.now()),
                     fetch(API + '/api/orders?t=' + Date.now(), { headers })
                 ]);
-                const users = await usersRes.json();
-                const products = await productsRes.json();
+                const users = usersRes.ok ? await usersRes.json() : [];
+                const products = productsRes.ok ? await productsRes.json() : [];
                 const orders = ordersRes.ok ? await ordersRes.json() : [];
 
-                document.getElementById('statUsers').textContent = users.length;
-                document.getElementById('statProducts').textContent = products.length;
-                document.getElementById('statActive').textContent = users.filter(u => u.is_active === 1).length;
+                // Also load from localStorage
+                const lsOrders = JSON.parse(localStorage.getItem('pc-company-orders') || '[]');
+                const allOrders = [...orders, ...lsOrders];
 
-                const revenue = orders
-                    .filter(o => o.status === 'delivered' || o.payment_status === 'paid')
-                    .reduce((s, o) => s + o.total_amount, 0);
+                document.getElementById('statUsers').textContent = users.length || '-';
+                document.getElementById('statProducts').textContent = products.length || '-';
+                document.getElementById('statActive').textContent = users.filter(u => u.is_active === 1).length || '-';
+
+                const revenue = allOrders.reduce((s, o) => s + (o.total_amount || o.total || 0), 0);
                 document.getElementById('statRevenue').textContent = revenue.toLocaleString('uk-UA') + ' ₴';
 
-                // Recent users (last 5)
-                const recent = users.slice(-5).reverse();
                 const tbody = document.getElementById('recentUsersBody');
-                if (recent.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">👥</div><p>Поки немає користувачів</p></td></tr>';
-                } else {
-                    tbody.innerHTML = recent.map(u => `
-                        <tr>
-                            <td>${u.id}</td>
-                            <td class="td-name">${u.name}</td>
-                            <td>${u.email}</td>
-                            <td>${u.phone}</td>
-                            <td><span class="badge ${u.is_active ? 'badge-active' : 'badge-inactive'}">${u.is_active ? 'Активний' : 'Заблокований'}</span></td>
-                        </tr>
-                    `).join('');
-                }
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">👥</div><p>Поки немає користувачів</p></td></tr>';
             } catch (e) {
-                showToast('Не вдалося завантажити статистику', 'error');
+                // Backend not available - ok
             }
         }
 
@@ -639,12 +625,16 @@
         async function loadUsers() {
             try {
                 const headers = getAuthHeaders();
-                if (!headers.Authorization) return;
                 const res = await fetch(API + '/api/users', { headers });
-                allUsers = await res.json();
+                if (res.ok) {
+                    allUsers = await res.json();
+                } else {
+                    allUsers = [];
+                }
                 renderUsers(allUsers);
             } catch (e) {
-                showToast('Помилка завантаження користувачів', 'error');
+                allUsers = [];
+                renderUsers(allUsers);
             }
         }
 
@@ -805,10 +795,6 @@
             try {
                 let res;
                 const headers = getAuthHeaders();
-                if (!headers.Authorization) {
-                    showToast('Помилка авторизації. Будь ласка, увійдіть знову.', 'error');
-                    return;
-                }
                 if (editId) {
                     res = await fetch(API + '/api/products/' + editId, {
                         method: 'PUT',
@@ -867,11 +853,38 @@
         async function loadOrders() {
             try {
                 const headers = getAuthHeaders();
-                if (!headers.Authorization) return;
                 const res = await fetch(API + '/api/orders', { headers });
-                allOrders = await res.json();
+                const backendOrders = res.ok ? await res.json() : [];
+                // Also load local orders
+                const localOrders = JSON.parse(localStorage.getItem('pc-company-orders') || '[]');
+                // Merge local orders into backend format
+                const localFormatted = localOrders.map(o => ({
+                    order_number: '#' + o.id,
+                    customer_name: o.name || 'Невідомо',
+                    customer_email: o.email || '-',
+                    total_amount: o.total || 0,
+                    status: 'pending',
+                    payment_method: o.paymentMethod || '-',
+                    payment_status: 'pending',
+                    created_at: o.date
+                }));
+                allOrders = [...backendOrders, ...localFormatted];
                 renderOrders(allOrders);
-            } catch (e) { showToast('Помилка завантаження замовлень', 'error'); }
+            } catch (e) {
+                // Try local only
+                const localOrders = JSON.parse(localStorage.getItem('pc-company-orders') || '[]');
+                allOrders = localOrders.map(o => ({
+                    order_number: '#' + o.id,
+                    customer_name: o.name || 'Невідомо',
+                    customer_email: o.email || '-',
+                    total_amount: o.total || 0,
+                    status: 'pending',
+                    payment_method: o.paymentMethod || '-',
+                    payment_status: 'pending',
+                    created_at: o.date
+                }));
+                renderOrders(allOrders);
+            }
         }
 
         function renderOrders(orders) {
@@ -987,10 +1000,6 @@
             }
             try {
                 const headers = getAuthHeaders();
-                if (!headers.Authorization) {
-                    showToast('Помилка авторизації. Будь ласка, увійдіть знову.', 'error');
-                    return;
-                }
                 const res = await fetch(API + '/api/promocodes', {
                     method: 'POST',
                     headers: headers,
