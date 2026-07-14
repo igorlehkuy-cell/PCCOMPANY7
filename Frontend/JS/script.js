@@ -266,7 +266,22 @@ function removeFromCart(index){ if(!confirm('Видалити цей товар 
 function proceedToCheckout(){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); if(cart.length===0){ alert('Кошик пуст! Додайте товари перед оформленням замовлення.'); return; } const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; if(!isLoggedIn){ alert('Будь ласка, спочатку увійдіть до свого аккаунту'); window.location.href='login.html'; return; } closeCartModal(); window.location.href='checkout.html'; }
 
 // --- Auth UI (simple) ---
-function updateAuthUI(){ const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; const currentUser = localStorage.getItem('pc-company-current-user'); const authLinks = document.querySelector('.auth-links'); if(!authLinks) return; if(isLoggedIn && currentUser){ try{ const user = JSON.parse(currentUser); authLinks.innerHTML = `<span class="auth-link welcome-text">Ласкаво просимо, ${user.name}!</span><button class="auth-link profile-link" id="profileOpenBtn">👤 Профіль</button><button class="auth-link logout-link" id="logoutBtn">Вийти</button>`; document.getElementById('profileOpenBtn').addEventListener('click', openProfileModal); document.getElementById('logoutBtn').addEventListener('click', logoutUser); }catch(e){ console.error(e); } } else { authLinks.innerHTML = `<a href="login.html" class="auth-link login-link">Вхід</a><a href="register.html" class="auth-link register-link">Реєстрація</a>`; } }
+function updateAuthUI() { 
+    const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; 
+    const currentUser = localStorage.getItem('pc-company-current-user'); 
+    const authLinks = document.querySelector('.auth-links'); 
+    if(!authLinks) return; 
+    
+    if(isLoggedIn && currentUser) { 
+        try { 
+            const user = JSON.parse(currentUser); 
+            authLinks.innerHTML = `<span class="auth-link welcome-text">Ласкаво просимо, ${user.name}!</span><a href="profile.html" class="auth-link profile-link" id="profileOpenBtn">👤 Профіль</a><button class="auth-link logout-link" id="logoutBtn">Вийти</button>`; 
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser); 
+        } catch(e) { console.error(e); } 
+    } else { 
+        authLinks.innerHTML = `<a href="login.html" class="auth-link login-link">Вхід</a><a href="register.html" class="auth-link register-link">Реєстрація</a>`; 
+    } 
+}
 
 function openProfileModal(){ const raw = localStorage.getItem('pc-company-current-user'); if(!raw){ alert('Помилка: дані користувача не знайдені'); return; } try{ const user = JSON.parse(raw); let modal = document.getElementById('profileModal'); if(!modal){ modal = document.createElement('div'); modal.id='profileModal'; modal.className='profile-modal'; document.body.appendChild(modal); } modal.innerHTML = `<div class="profile-modal-content"><div class="profile-modal-header"><h2>Мій профіль</h2><button class="profile-modal-close">&times;</button></div><div class="profile-modal-body"><div class="profile-field"><label>Ім'я:</label><input id="profileName" value="${user.name}"></div><div class="profile-field"><label>Email:</label><input id="profileEmail" value="${user.email}" disabled><small>Email не можна змінити</small></div><div class="profile-field"><label>Телефон:</label><input id="profilePhone" value="${user.phone}"></div><div class="profile-field"><label>Новий пароль:</label><input id="profilePassword" type="password" placeholder="залишіть пусто щоб не змінювати"></div></div><div class="profile-modal-footer"><button class="btn-save" id="saveProfileBtn">Зберегти зміни</button><button class="btn-cancel" id="closeProfileBtn">Закрити</button></div></div>`; modal.style.display='flex'; modal.querySelector('.profile-modal-close').addEventListener('click', closeProfileModal); modal.querySelector('#closeProfileBtn').addEventListener('click', closeProfileModal); modal.querySelector('#saveProfileBtn').addEventListener('click', saveProfileChanges); modal.addEventListener('click', (e)=>{ if(e.target===modal) closeProfileModal(); }); }catch(e){ console.error(e); alert('Помилка при відкритті профілю'); } }
 function closeProfileModal(){ const m=document.getElementById('profileModal'); if(m) m.style.display='none'; }
@@ -280,6 +295,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
   populateManufacturerOptions(filterState.type || 'all');
   renderProducts();
   updateAuthUI();
+  
+  // Theme Toggle Logic
+  const themeToggle = document.getElementById('themeCheckbox');
+  if (themeToggle) {
+      themeToggle.checked = localStorage.getItem('pc-company-theme') === 'dark';
+      themeToggle.addEventListener('change', (e) => {
+          const newTheme = e.target.checked ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('pc-company-theme', newTheme);
+      });
+  }
+
   // wire filter button
   const btn = document.querySelector('.filter-btn'); if(btn) btn.addEventListener('click', openFilterPanel);
   // wire cart button
