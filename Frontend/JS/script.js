@@ -141,7 +141,7 @@ function saveFiltersFromUI(){
   const t=document.getElementById('filterTypeSelect'), c=document.getElementById('filterCategorySelect'), m=document.getElementById('filterManufacturerSelect'), min=document.getElementById('filterPriceMin'), max=document.getElementById('filterPriceMax');
   const newMin = min && min.value!=='' ? Number(min.value) : null;
   const newMax = max && max.value!=='' ? Number(max.value) : null;
-  if(newMin!==null && newMax!==null && newMin>newMax){ alert('Помилка: мінімальна ціна не може бути більше за максимальну.'); return; }
+  if(newMin!==null && newMax!==null && newMin>newMax){ showToast('Помилка: мінімальна ціна не може бути більше за максимальну.', 'warning'); return; }
   filterState.type = t ? t.value : 'all';
   filterState.category = c ? c.value : 'all';
   filterState.manufacturer = m ? m.value : 'all';
@@ -208,7 +208,7 @@ function createProductModal(){
 
 function openProductModal(id){
   createProductModal();
-  const product = products.find(p=>p.id===id); if(!product){ alert('Товар не знайдено'); return; }
+  const product = products.find(p=>p.id===id); if(!product){ showToast('Товар не знайдено', 'error'); return; }
   document.getElementById('modalProductName').textContent = product.name;
   document.getElementById('modalProductPrice').textContent = formatUSD(product.priceUSD);
   document.getElementById('modalProductType').textContent = product.type==='desktop'?'Комп\'ютер':'Ноутбук';
@@ -241,14 +241,14 @@ function openProductModal(id){
 function closeProductModal(){ const m=document.getElementById('productModal'); if(m) m.style.display='none'; }
 
 // Reviews
-function submitReview(){ const name=document.getElementById('reviewName').value.trim(); const text=document.getElementById('reviewText').value.trim(); if(!name||!text){ alert('Будь ласка, заповніть усі поля!'); return; } const list=document.getElementById('reviewsList'); const no=list.querySelector('.no-reviews'); if(no) no.remove(); const item=document.createElement('div'); item.className='review-item'; item.innerHTML=`<div class="review-author">${name}</div><div class="review-text">${text}</div><div class="review-date">${new Date().toLocaleDateString('uk-UA')}</div>`; list.appendChild(item); document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; alert('Відгук успішно додано!'); }
+function submitReview(){ const name=document.getElementById('reviewName').value.trim(); const text=document.getElementById('reviewText').value.trim(); if(!name||!text){ showToast('Будь ласка, заповніть усі поля!', 'warning'); return; } const list=document.getElementById('reviewsList'); const no=list.querySelector('.no-reviews'); if(no) no.remove(); const item=document.createElement('div'); item.className='review-item'; item.innerHTML=`<div class="review-author">${name}</div><div class="review-text">${text}</div><div class="review-date">${new Date().toLocaleDateString('uk-UA')}</div>`; list.appendChild(item); document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; showToast('Відгук успішно додано!', 'success'); }
 
 // --- Cart ---
 function addProductToCart(id, name, price, type){
   const cart = JSON.parse(localStorage.getItem('pc-company-cart')||'[]');
   const existing = cart.find(i=>i.id===id);
   if(existing) existing.quantity +=1; else cart.push({id,name,price,type,quantity:1});
-  localStorage.setItem('pc-company-cart', JSON.stringify(cart)); alert(`${name} додано до кошика!`);
+  localStorage.setItem('pc-company-cart', JSON.stringify(cart)); showToast(`${name} додано до кошика! 🛒`, 'success');
 }
 function createCartModal(){ if(document.getElementById('cartModal')) return; const modal=document.createElement('div'); modal.id='cartModal'; modal.className='cart-modal'; modal.innerHTML=`<div class="cart-modal-content"><div class="cart-modal-header"><h2>🛒 Мій кошик</h2><button class="cart-modal-close">&times;</button></div><div class="cart-modal-body"><div id="cartItemsList" class="cart-items-list"><p class="empty-cart">Кошик пустий</p></div></div><div class="cart-modal-summary"><div class="cart-summary-row"><span>Кількість товарів:</span><span id="cartItemCount">0</span></div><div class="cart-summary-row total"><span>Загалом:</span><span id="cartTotalPrice">0 $</span></div></div><div class="cart-modal-footer"><button class="btn-continue-shopping">Продовжити покупки</button><button class="btn-checkout">Оформити замовлення</button></div></div>`; document.body.appendChild(modal); modal.querySelector('.cart-modal-close').addEventListener('click', closeCartModal); modal.addEventListener('click', (e)=>{ if(e.target===modal) closeCartModal(); }); modal.querySelector('.btn-continue-shopping').addEventListener('click', closeCartModal); modal.querySelector('.btn-checkout').addEventListener('click', proceedToCheckout);
 }
@@ -262,8 +262,8 @@ function renderCartItems(){ const list=document.getElementById('cartItemsList');
 }
 function changeCartItemQuantity(index, change){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); if(cart[index]){ cart[index].quantity = Math.max(1, cart[index].quantity + change); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); } }
 function updateCartItemQuantity(index, value){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); const qty = parseInt(value)||1; if(cart[index]){ cart[index].quantity = Math.max(1, qty); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); } }
-function removeFromCart(index){ if(!confirm('Видалити цей товар з кошика?')) return; const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); cart.splice(index,1); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); alert('✅ Товар видалено з кошика'); }
-function proceedToCheckout(){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); if(cart.length===0){ alert('Кошик пуст! Додайте товари перед оформленням замовлення.'); return; } const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; if(!isLoggedIn){ alert('Будь ласка, спочатку увійдіть до свого аккаунту'); window.location.href='login.html'; return; } closeCartModal(); window.location.href='checkout.html'; }
+function removeFromCart(index){ if(!confirm('Видалити цей товар з кошика?')) return; const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); cart.splice(index,1); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); showToast('✅ Товар видалено з кошика', 'success'); }
+function proceedToCheckout(){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); if(cart.length===0){ showToast('Кошик пустий! Додайте товари перед оформленням.', 'warning'); return; } const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; if(!isLoggedIn){ showToast('Будь ласка, спочатку увійдіть до свого аккаунту', 'warning'); setTimeout(() => window.location.href='login.html', 1500); return; } closeCartModal(); window.location.href='checkout.html'; }
 
 // --- Auth UI with avatar (like rental.js) ---
 function getDefaultAvatarSrc(idx) { return `../images/avatars/preset_${idx}.svg`; }
@@ -291,10 +291,10 @@ function updateAuthUI() {
     } 
 }
 
-function openProfileModal(){ const raw = localStorage.getItem('pc-company-current-user'); if(!raw){ alert('Помилка: дані користувача не знайдені'); return; } try{ const user = JSON.parse(raw); let modal = document.getElementById('profileModal'); if(!modal){ modal = document.createElement('div'); modal.id='profileModal'; modal.className='profile-modal'; document.body.appendChild(modal); } modal.innerHTML = `<div class="profile-modal-content"><div class="profile-modal-header"><h2>Мій профіль</h2><button class="profile-modal-close">&times;</button></div><div class="profile-modal-body"><div class="profile-field"><label>Ім'я:</label><input id="profileName" value="${user.name}"></div><div class="profile-field"><label>Email:</label><input id="profileEmail" value="${user.email}" disabled><small>Email не можна змінити</small></div><div class="profile-field"><label>Телефон:</label><input id="profilePhone" value="${user.phone}"></div><div class="profile-field"><label>Новий пароль:</label><input id="profilePassword" type="password" placeholder="залишіть пусто щоб не змінювати"></div></div><div class="profile-modal-footer"><button class="btn-save" id="saveProfileBtn">Зберегти зміни</button><button class="btn-cancel" id="closeProfileBtn">Закрити</button></div></div>`; modal.style.display='flex'; modal.querySelector('.profile-modal-close').addEventListener('click', closeProfileModal); modal.querySelector('#closeProfileBtn').addEventListener('click', closeProfileModal); modal.querySelector('#saveProfileBtn').addEventListener('click', saveProfileChanges); modal.addEventListener('click', (e)=>{ if(e.target===modal) closeProfileModal(); }); }catch(e){ console.error(e); alert('Помилка при відкритті профілю'); } }
+function openProfileModal(){ const raw = localStorage.getItem('pc-company-current-user'); if(!raw){ showToast('Помилка: дані користувача не знайдені', 'error'); return; } try{ const user = JSON.parse(raw); let modal = document.getElementById('profileModal'); if(!modal){ modal = document.createElement('div'); modal.id='profileModal'; modal.className='profile-modal'; document.body.appendChild(modal); } modal.innerHTML = `<div class="profile-modal-content"><div class="profile-modal-header"><h2>Мій профіль</h2><button class="profile-modal-close">&times;</button></div><div class="profile-modal-body"><div class="profile-field"><label>Ім'я:</label><input id="profileName" value="${user.name}"></div><div class="profile-field"><label>Email:</label><input id="profileEmail" value="${user.email}" disabled><small>Email не можна змінити</small></div><div class="profile-field"><label>Телефон:</label><input id="profilePhone" value="${user.phone}"></div><div class="profile-field"><label>Новий пароль:</label><input id="profilePassword" type="password" placeholder="залишіть пусто щоб не змінювати"></div></div><div class="profile-modal-footer"><button class="btn-save" id="saveProfileBtn">Зберегти зміни</button><button class="btn-cancel" id="closeProfileBtn">Закрити</button></div></div>`; modal.style.display='flex'; modal.querySelector('.profile-modal-close').addEventListener('click', closeProfileModal); modal.querySelector('#closeProfileBtn').addEventListener('click', closeProfileModal); modal.querySelector('#saveProfileBtn').addEventListener('click', saveProfileChanges); modal.addEventListener('click', (e)=>{ if(e.target===modal) closeProfileModal(); }); }catch(e){ console.error(e); showToast('Помилка при відкритті профілю', 'error'); } }
 function closeProfileModal(){ const m=document.getElementById('profileModal'); if(m) m.style.display='none'; }
-function saveProfileChanges(){ try{ const currentUser = JSON.parse(localStorage.getItem('pc-company-current-user')); const newName = document.getElementById('profileName').value.trim(); const newPhone = document.getElementById('profilePhone').value.trim(); const newPass = document.getElementById('profilePassword').value; if(!newName){ alert('Будь ласка, введіть ім'+'я!'); return; } if(!newPhone){ alert('Будь ласка, введіть номер телефону!'); return; } currentUser.name=newName; currentUser.phone=newPhone; if(newPass && newPass.length>=6){ currentUser.password=newPass; } else if(newPass && newPass.length>0 && newPass.length<6){ alert('Пароль повинен бути мінімум 6 символів!'); return; } localStorage.setItem('pc-company-user', JSON.stringify(currentUser)); localStorage.setItem('pc-company-current-user', JSON.stringify(currentUser)); alert('✅ Зміни успішно збережені!'); closeProfileModal(); updateAuthUI(); }catch(e){ console.error(e); alert('Помилка при збереженні'); } }
-function logoutUser(){ if(!confirm('Ви впевнені, що хочете вийти?')) return; localStorage.setItem('pc-company-logged-in','false'); localStorage.removeItem('pc-company-current-user'); localStorage.removeItem('pc-company-remember'); alert('Ви успішно вийшли з аккаунту'); window.location.href='index.html'; }
+function saveProfileChanges(){ try{ const currentUser = JSON.parse(localStorage.getItem('pc-company-current-user')); const newName = document.getElementById('profileName').value.trim(); const newPhone = document.getElementById('profilePhone').value.trim(); const newPass = document.getElementById('profilePassword').value; if(!newName){ showToast('Будь ласка, введіть ім\'я!', 'warning'); return; } if(!newPhone){ showToast('Будь ласка, введіть номер телефону!', 'warning'); return; } currentUser.name=newName; currentUser.phone=newPhone; if(newPass && newPass.length>=6){ currentUser.password=newPass; } else if(newPass && newPass.length>0 && newPass.length<6){ showToast('Пароль повинен бути мінімум 6 символів!', 'warning'); return; } localStorage.setItem('pc-company-user', JSON.stringify(currentUser)); localStorage.setItem('pc-company-current-user', JSON.stringify(currentUser)); showToast('✅ Зміни успішно збережені!', 'success'); closeProfileModal(); updateAuthUI(); }catch(e){ console.error(e); showToast('Помилка при збереженні', 'error'); } }
+function logoutUser(){ if(!confirm('Ви впевнені, що хочете вийти?')) return; localStorage.setItem('pc-company-logged-in','false'); localStorage.removeItem('pc-company-current-user'); localStorage.removeItem('pc-company-remember'); showToast('Ви успішно вийшли з аккаунту', 'success'); window.location.href='index.html'; }
 
 // --- Initialization on DOMContentLoaded ---
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const email = document.getElementById('reviewAuthorEmail').value.trim();
       const text = document.getElementById('reviewTextContent').value.trim();
       if(!email || !text) {
-        alert('Будь ласка, заповніть усі поля!');
+        showToast('Будь ласка, заповніть усі поля!', 'warning');
         return;
       }
       const accordion = document.getElementById('accordionFlushExample');
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const modal = bootstrap.Modal.getInstance(modalEl);
       if(modal) modal.hide();
       
-      alert('Дякуємо! Ваш відгук додано успішно.');
+      showToast('Дякуємо! Ваш відгук додано успішно.', 'success');
     });
   }
 });

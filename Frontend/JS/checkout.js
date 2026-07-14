@@ -320,12 +320,12 @@ if (checkoutForm) {
 
         // Validate
         if (!pendingOrderData.location) {
-            alert('Виберіть місто/локацію доставки на карті!');
+            showToast('Виберіть місто/локацію доставки на карті!', 'warning');
             return;
         }
 
         if (!pendingOrderData.paymentMethod) {
-            alert('Виберіть способ оплати!');
+            showToast('Виберіть спосіб оплати!', 'warning');
             return;
         }
 
@@ -398,13 +398,18 @@ function closePaymentModal() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     if (checkout.cart.length === 0) {
-        alert('Кошик порожній! Повертаємося на головну...');
-        window.location.href = 'index.html';
+        showToast('Кошик порожній! Повертаємося на головну...', 'warning');
+        setTimeout(() => window.location.href = 'index.html', 1500);
         return;
     }
 
     renderOrderSummary();
-    initMap();
+    // Init map after leaflet is fully loaded
+    if (typeof L !== 'undefined') {
+        initMap();
+    } else {
+        window.addEventListener('load', initMap);
+    }
 
     // Handle payment method toggles
     // Setup modal events
@@ -420,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pendingOrderData.paymentMethod === 'card') {
                 const cardNum = document.getElementById('modalCardNumber').value;
                 if (!cardNum || cardNum.trim() === '') {
-                    alert('Будь ласка, введіть дійсний номер кредитної карти.');
+                    showToast('Будь ласка, введіть дійсний номер кредитної карти.', 'error');
                     return;
                 }
                 pendingOrderData.cardNumber = cardNum;
@@ -436,8 +441,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Send to telegram
             await sendTelegramNotification(order, pendingOrderData);
 
-            alert(`Замовлення успішно оформлено!\nНомер замовлення: ${order.id}\nЦей номер надішлемо вам на email ${pendingOrderData.email}`);
-            window.location.href = 'index.html';
+            showToast(`Замовлення успішно оформлено! 🎉 #${order.id}`, 'success');
+            setTimeout(() => window.location.href = 'index.html', 2500);
         });
     }
 
