@@ -106,32 +106,32 @@
 
             // Перевірка згоди з умовами
             if (!agree) {
-                alert('Ви повинні згодитись з умовами та політикою приватності');
+                showToast('Ви повинні згодитись з умовами та політикою приватності', 'warning');
                 return;
             }
 
             // Перевірка на пусті поля
             if (!name || !email || !phone || !password) {
-                alert('Будь ласка, заповніть всі поля!');
+                showToast('Будь ласка, заповніть всі поля!', 'warning');
                 return;
             }
 
             // Перевірка паролю
             if (password !== confirmPassword) {
-                alert('Паролі не співпадають!');
+                showToast('Паролі не співпадають!', 'error');
                 return;
             }
 
             // Перевірка довжини пароля
             if (password.length < 6) {
-                alert('Пароль повинен бути мінімум 6 символів!');
+                showToast('Пароль повинен бути мінімум 6 символів!', 'warning');
                 return;
             }
 
             // Перевірка формату email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                alert('Будь ласка, введіть корректну електронну пошту!');
+                showToast('Будь ласка, введіть корректну електронну пошту!', 'warning');
                 return;
             }
 
@@ -150,16 +150,17 @@
                 localStorage.setItem('pc-company-logged-in', 'false');
                 console.log('User data saved successfully');
 
-                alert('✅ Реєстрація успішна! Тепер увійдіть у свій аккаунт.');
+                showToast('✅ Реєстрація успішна! Тепер увійдіть у свій аккаунт.', 'success');
                 setTimeout(() => {
                     window.location.href = 'login.html';
-                }, 500);
+                }, 1500);
             } catch (error) {
-                alert('⚠️ Помилка при реєстрації. Спробуйте ще раз.');
+                showToast('⚠️ Помилка при реєстрації. Спробуйте ще раз.', 'error');
                 console.error('Registration error:', error);
             }
         });
     </script>
+    <script src="../JS/toast.js"></script>
 </body>
 </html>
 

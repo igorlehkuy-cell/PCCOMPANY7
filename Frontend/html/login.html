@@ -75,7 +75,7 @@
 
             // Валідація полів
             if (!email || !password) {
-                alert('Будь ласка, заповніть всі поля!');
+                showToast('Будь ласка, заповніть всі поля!', 'warning');
                 return;
             }
 
@@ -97,8 +97,8 @@
                 } else {
                     localStorage.removeItem('pc-company-remember');
                 }
-                alert('Вхід успішний! 👋 Вітаємо, Адміністраторе!');
-                window.location.href = 'index.html';
+                showToast('Вхід успішний! 👋 Вітаємо, Адміністраторе!', 'success');
+                setTimeout(() => window.location.href = 'index.html', 1500);
                 return;
             }
 
@@ -107,8 +107,8 @@
             console.log('User data from storage:', userData);
 
             if (!userData) {
-                alert('Спочатку потрібно зареєструватися!');
-                window.location.href = 'register.html';
+                showToast('Спочатку потрібно зареєструватися!', 'error');
+                setTimeout(() => window.location.href = 'register.html', 1500);
                 return;
             }
 
@@ -133,18 +133,18 @@
                     }
 
                     // Показуємо повідомлення про успіх
-                    alert('Вхід успішний! 👋');
+                    showToast('Вхід успішний! 👋', 'success');
 
                     // Перенаправляємо на головну сторінку
-                    window.location.href = 'index.html';
+                    setTimeout(() => window.location.href = 'index.html', 1500);
                 } else {
                     console.log('Invalid credentials');
-                    alert('❌ Невірний email або пароль!');
+                    showToast('❌ Невірний email або пароль!', 'error');
                     // Очищаємо поле пароля для безпеки
                     passwordInput.value = '';
                 }
             } catch (error) {
-                alert('⚠️ Помилка при обробці даних. Спробуйте повторити.');
+                showToast('⚠️ Помилка при обробці даних. Спробуйте повторити.', 'error');
                 console.error('Login error:', error);
             }
         }
@@ -176,5 +176,6 @@
             }
         });
     </script>
+    <script src="../JS/toast.js"></script>
 </body>
 </html>
