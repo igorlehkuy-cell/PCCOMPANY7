@@ -248,7 +248,7 @@ function addProductToCart(id, name, price, type){
   const cart = JSON.parse(localStorage.getItem('pc-company-cart')||'[]');
   const existing = cart.find(i=>i.id===id);
   if(existing) existing.quantity +=1; else cart.push({id,name,price,type,quantity:1});
-  localStorage.setItem('pc-company-cart', JSON.stringify(cart)); showToast(`${name} додано до кошика! 🛒`, 'success');
+  localStorage.setItem('pc-company-cart', JSON.stringify(cart)); showToast(`${name} додано до кошика! 🛒`, 'success'); updateCartBadge();
 }
 function createCartModal(){ if(document.getElementById('cartModal')) return; const modal=document.createElement('div'); modal.id='cartModal'; modal.className='cart-modal'; modal.innerHTML=`<div class="cart-modal-content"><div class="cart-modal-header"><h2>🛒 Мій кошик</h2><button class="cart-modal-close">&times;</button></div><div class="cart-modal-body"><div id="cartItemsList" class="cart-items-list"><p class="empty-cart">Кошик пустий</p></div></div><div class="cart-modal-summary"><div class="cart-summary-row"><span>Кількість товарів:</span><span id="cartItemCount">0</span></div><div class="cart-summary-row total"><span>Загалом:</span><span id="cartTotalPrice">0 $</span></div></div><div class="cart-modal-footer"><button class="btn-continue-shopping">Продовжити покупки</button><button class="btn-checkout">Оформити замовлення</button></div></div>`; document.body.appendChild(modal); modal.querySelector('.cart-modal-close').addEventListener('click', closeCartModal); modal.addEventListener('click', (e)=>{ if(e.target===modal) closeCartModal(); }); modal.querySelector('.btn-continue-shopping').addEventListener('click', closeCartModal); modal.querySelector('.btn-checkout').addEventListener('click', proceedToCheckout);
 }
@@ -260,9 +260,9 @@ function renderCartItems(){ const list=document.getElementById('cartItemsList');
   list.querySelectorAll('.cart-qty-input').forEach(inp=> inp.addEventListener('change', (e)=>{ const idx=Number(inp.dataset.idx); updateCartItemQuantity(idx, inp.value); }));
   list.querySelectorAll('.cart-item-remove').forEach(btn=> btn.addEventListener('click', ()=> removeFromCart(Number(btn.dataset.idx))));
 }
-function changeCartItemQuantity(index, change){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); if(cart[index]){ cart[index].quantity = Math.max(1, cart[index].quantity + change); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); } }
-function updateCartItemQuantity(index, value){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); const qty = parseInt(value)||1; if(cart[index]){ cart[index].quantity = Math.max(1, qty); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); } }
-function removeFromCart(index){ if(!confirm('Видалити цей товар з кошика?')) return; const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); cart.splice(index,1); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); showToast('✅ Товар видалено з кошика', 'success'); }
+function changeCartItemQuantity(index, change){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); if(cart[index]){ cart[index].quantity = Math.max(1, cart[index].quantity + change); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); updateCartBadge(); } }
+function updateCartItemQuantity(index, value){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); const qty = parseInt(value)||1; if(cart[index]){ cart[index].quantity = Math.max(1, qty); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); updateCartBadge(); } }
+function removeFromCart(index){ if(!confirm('Видалити цей товар з кошика?')) return; const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); cart.splice(index,1); localStorage.setItem('pc-company-cart', JSON.stringify(cart)); renderCartItems(); updateCartBadge(); showToast('Товар видалено з кошика', 'success'); }
 function proceedToCheckout(){ const cart=JSON.parse(localStorage.getItem('pc-company-cart')||'[]'); if(cart.length===0){ showToast('Кошик пустий! Додайте товари перед оформленням.', 'warning'); return; } const isLoggedIn = localStorage.getItem('pc-company-logged-in') === 'true'; if(!isLoggedIn){ showToast('Будь ласка, спочатку увійдіть до свого аккаунту', 'warning'); setTimeout(() => window.location.href='login.html', 1500); return; } closeCartModal(); window.location.href='checkout.html'; }
 
 // --- Auth UI with avatar (like rental.js) ---
@@ -379,4 +379,25 @@ document.addEventListener('DOMContentLoaded', ()=>{
       showToast('Дякуємо! Ваш відгук додано успішно.', 'success');
     });
   }
+});
+
+// --- Cart Badge ---
+function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('pc-company-cart') || '[]');
+    const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    document.querySelectorAll('#cartBadge').forEach(badge => {
+        badge.textContent = count;
+        if (count === 0) {
+            badge.classList.add('hidden');
+        } else {
+            badge.classList.remove('hidden');
+            badge.classList.remove('bump');
+            void badge.offsetWidth;
+            badge.classList.add('bump');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartBadge();
 });
