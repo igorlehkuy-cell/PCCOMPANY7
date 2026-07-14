@@ -78,7 +78,7 @@
                         <div class="summary-divider"></div>
                         <div class="summary-row total">
                             <span> Усього:</span>
-                            <span id="orderTotal"> 0 грн</span>
+                            <span id="orderTotal"> 0 $</span>
                         </div>
                     </div>
 
@@ -106,7 +106,7 @@
                                     вибрано</span></p>
                             <p style="margin: 5px 0 0 0; font-size: 14px; color: var(--text-dark);">Вартість доставки:
                                 <span id="selected-branch-price"
-                                    style="color: var(--primary-brown); font-weight: 600;">0 грн</span>
+                                    style="color: var(--primary-brown); font-weight: 600;">0 $</span>
                             </p>
                         </div>
                         <p style="margin: 10px 0 0 0; font-size: 13px; color: #555;">*Ви можете вибрати відділення на
@@ -151,7 +151,7 @@
                         </div>
                         <div class="form-group">
                             <label for="address">Вулиця та номер будинку / Відділення</label>
-                            <input type="text" id="address" name="address" required>
+                            <input type="text" id="address" name="address" placeholder="Виберіть на карті..." readonly required style="cursor: pointer; background: rgba(0,0,0,0.2);" onclick="document.getElementById('delivery-map').scrollIntoView({behavior: 'smooth'})">
                         </div>
                         <div class="form-row">
                             <div class="form-group">

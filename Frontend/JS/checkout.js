@@ -10,7 +10,7 @@ async function sendTelegramNotification(order, orderData) {
         return;
     }
 
-    const itemsStr = order.items.map(item => `  • ${item.name} (x${item.quantity}) - ${parseInt(item.price) * item.quantity} грн`).join('\n');
+    const itemsStr = order.items.map(item => `  • ${item.name} (x${item.quantity}) - $${parseInt(item.price) * item.quantity}`).join('\n');
     const paymentMethodMap = {
         'card': 'Банківська карта',
         'transfer': 'Банківський переказ',
@@ -48,7 +48,7 @@ async function sendTelegramNotification(order, orderData) {
 🛒 <b>Товари:</b>
 ${itemsStr}
 
-💵 <b>Разом до оплати:</b> ${order.total} грн
+💵💰 <b>Всього до сплати:</b> $${order.total}
     `;
 
     try {
@@ -140,7 +140,7 @@ function renderOrderSummary() {
         const itemTotal = price * item.quantity;
         itemElem.innerHTML = `
             <span>${item.name} x${item.quantity}</span>
-            <span>${itemTotal} грн</span>
+            <span>$${itemTotal}</span>
         `;
         orderItemsContainer.appendChild(itemElem);
     });
@@ -148,7 +148,7 @@ function renderOrderSummary() {
     // Update total
     if (orderTotalElem) {
         const total = checkout.getCartTotal();
-        orderTotalElem.textContent = `${total} грн`;
+        orderTotalElem.textContent = `$${total}`;
     }
 }
 
@@ -363,11 +363,17 @@ function initMap() {
         }
 
         branchNameElem.textContent = isCustom ? `Власна адреса (${city})` : `${city}, ${address}`;
-        branchPriceElem.textContent = deliveryPrice === 0 && !isCustom ? 'Безкоштовно' : `${deliveryPrice} грн`;
+        branchPriceElem.textContent = deliveryPrice === 0 && !isCustom ? 'Безкоштовно' : `$${deliveryPrice}`;
 
         const total = checkout.getCartTotal() + deliveryPrice;
         if (orderTotalElem) {
-            orderTotalElem.textContent = `${total} грн`;
+            orderTotalElem.textContent = `$${total}`;
+        }
+        
+        // Populate the read-only address input
+        const addressInput = document.getElementById('address');
+        if (addressInput) {
+            addressInput.value = isCustom ? `${city} (Власна адреса)` : `${city}, ${address}`;
         }
 
         map.closePopup();
