@@ -284,8 +284,24 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const btn = document.querySelector('.filter-btn'); if(btn) btn.addEventListener('click', openFilterPanel);
   // wire cart button
   const cartBtn = document.querySelector('.cart-btn'); if(cartBtn) cartBtn.addEventListener('click', openCartModal);
-  // observe appear animations (keep small)
-  setTimeout(()=>{ document.querySelectorAll('.product-card').forEach(card=>{ card.style.opacity='0'; card.style.transform='translateY(20px)'; card.style.transition='opacity 0.5s ease, transform 0.5s ease'; }); }, 100);
+  // intersection observer for reveal animations
+  const revealCallbacks = (entries, observer) => {
+      entries.forEach(entry => {
+          if (entry.isIntersecting) {
+              entry.target.classList.add('active');
+              observer.unobserve(entry.target);
+          }
+      });
+  };
+  const revealObserver = new IntersectionObserver(revealCallbacks, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  
+  window.observeReveals = () => {
+      document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .product-card').forEach(el => {
+          if (el.classList.contains('product-card')) el.classList.add('reveal');
+          revealObserver.observe(el);
+      });
+  };
+  window.observeReveals();
   // render site reviews form if exists
   const saveReviewBtn = document.getElementById('saveReviewBtn');
   if(saveReviewBtn) {
