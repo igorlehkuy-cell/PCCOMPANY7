@@ -186,21 +186,88 @@ function initMap() {
         marker.bindPopup(`
             <div style="text-align: center;">
                 <b>${branch.city}</b><br>
-                ${branch.address}<br>
+                <span style="font-size:13px;">${branch.address}</span><br>
+                <div style="margin: 8px 0; font-size: 13px; color: #4CAF50;">📦 В наявності (доставка 0-1 день)</div>
                 <button type="button" 
                         class="btn-select-branch" 
-                        style="margin-top:8px; padding:6px 12px; background:var(--dark-brown); color:white; border:none; border-radius:4px; cursor:pointer;" 
+                        style="margin-top:4px; padding:6px 12px; background:var(--dark-brown); color:white; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:bold; transition: 0.3s;"
+                        onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='var(--dark-brown)'"
                         onclick="selectBranch('${branch.city}', '${branch.address}')">
-                    Вибрати це відділення
+                    Вибрати відділення
                 </button>
             </div>
         `);
     });
 
     let userMarker = null;
+    let deliveryPolyline = null;
+    let animatedTruck = null;
+    let truckAnimationInterval = null;
 
-    // Central point (Kyiv) for calculating distance
+    // Central point (Kyiv - our store) for calculating distance
     const kyivCoords = { lat: 50.4501, lng: 30.5234 };
+
+    // Custom truck icon
+    const truckIcon = L.divIcon({
+        className: 'truck-icon',
+        html: '<div style="font-size: 24px; animation: bounce 1s infinite;">🚚</div>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+
+    // Helper to calculate estimated delivery date based on distance
+    function getEstimatedDeliveryHTML(distance) {
+        const today = new Date();
+        let days = 0;
+        if(distance > 800) days = 3;
+        else if(distance > 300) days = 2;
+        else if(distance > 50) days = 1;
+
+        if (days === 0) return '<b style="color:var(--accent);">Сьогодні</b> (в межах 2-3 годин)';
+        if (days === 1) return '<b style="color:var(--accent);">Завтра</b> (до кінця дня)';
+        
+        today.setDate(today.getDate() + days);
+        return `<b style="color:var(--accent);">${today.toLocaleDateString('uk-UA')}</b> (Орієнтовно)`;
+    }
+
+    function animateTruckTo(targetLat, targetLng) {
+        if (animatedTruck) map.removeLayer(animatedTruck);
+        if (deliveryPolyline) map.removeLayer(deliveryPolyline);
+        if (truckAnimationInterval) clearInterval(truckAnimationInterval);
+
+        // Draw dotted line
+        deliveryPolyline = L.polyline([[kyivCoords.lat, kyivCoords.lng], [targetLat, targetLng]], {
+            color: 'var(--accent)',
+            dashArray: '5, 10',
+            weight: 3,
+            opacity: 0.7
+        }).addTo(map);
+
+        animatedTruck = L.marker([kyivCoords.lat, kyivCoords.lng], { icon: truckIcon }).addTo(map);
+
+        const steps = 60;
+        let currentStep = 0;
+        const dLat = (targetLat - kyivCoords.lat) / steps;
+        const dLng = (targetLng - kyivCoords.lng) / steps;
+
+        truckAnimationInterval = setInterval(() => {
+            currentStep++;
+            const nextLat = kyivCoords.lat + (dLat * currentStep);
+            const nextLng = kyivCoords.lng + (dLng * currentStep);
+            animatedTruck.setLatLng([nextLat, nextLng]);
+
+            if (currentStep >= steps) {
+                clearInterval(truckAnimationInterval);
+                // Turn truck into a green checkmark upon arrival
+                animatedTruck.setIcon(L.divIcon({
+                    className: 'check-icon',
+                    html: '<div style="font-size: 24px; color: #4CAF50;">✅</div>',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                }));
+            }
+        }, 30);
+    }
 
     // Haversine formula to calculate distance between two lat/lng coordinates in kilometers
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -238,28 +305,40 @@ function initMap() {
                 const city = data.address.city || data.address.town || data.address.village || data.address.state || 'Україна';
                 const addressText = data.display_name;
 
+                const etaHTML = getEstimatedDeliveryHTML(distance);
+
                 userMarker.bindPopup(`
                     <div style="text-align: center;">
                         <b style="color:var(--dark-brown);">Ваше місцезнаходження</b><br>
                         ${city}<br>
-                        <span style="font-size: 13px; color: #666;">Відстань: ${Math.round(distance)} км</span><br>
+                        <span style="font-size: 13px; color: #666;">Відстань від нашого складу: ${Math.round(distance)} км</span><br>
+                        <div style="margin: 8px 0; padding: 6px; background: rgba(220,165,110,0.1); border-radius: 4px; font-size: 13px;">
+                            Час доставки: ${etaHTML}
+                        </div>
                         <button type="button" class="btn-select-branch" 
-                                style="margin-top:8px; padding:6px 12px; background:var(--dark-brown); color:white; border:none; border-radius:4px; cursor:pointer;"
-                                onclick="selectBranch('${city.replace(/'/g, "\\'")}', 'Власна адреса: ${addressText.replace(/'/g, "\\'")}', true, ${dynamicPrice})">
-                            Вибрати цю локацію
+                                style="margin-top:4px; padding:6px 12px; background:var(--dark-brown); color:white; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:bold; transition: 0.3s;"
+                                onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='var(--dark-brown)'"
+                                onclick="selectBranch('${city.replace(/'/g, "\\'")}', 'Власна адреса: ${addressText.replace(/'/g, "\\'")}', true, ${dynamicPrice}); animateTruckTo(${e.latlng.lat}, ${e.latlng.lng})">
+                            Підтвердити локацію
                         </button>
                     </div>
                 `).openPopup();
             })
             .catch(() => {
+                const etaHTML = getEstimatedDeliveryHTML(distance);
+
                 userMarker.bindPopup(`
                     <div style="text-align: center;">
                         <b style="color:var(--dark-brown);">Ваше місцезнаходження</b><br>
-                        <span style="font-size: 13px; color: #666;">Відстань: ${Math.round(distance)} км</span><br>
+                        <span style="font-size: 13px; color: #666;">Відстань від складу: ${Math.round(distance)} км</span><br>
+                        <div style="margin: 8px 0; padding: 6px; background: rgba(220,165,110,0.1); border-radius: 4px; font-size: 13px;">
+                            Час доставки: ${etaHTML}
+                        </div>
                         <button type="button" class="btn-select-branch" 
-                                style="margin-top:8px; padding:6px 12px; background:var(--dark-brown); color:white; border:none; border-radius:4px; cursor:pointer;"
-                                onclick="selectBranch('Інше', 'Власна адреса на карті', true, ${dynamicPrice})">
-                            Вибрати цю локацію
+                                style="margin-top:4px; padding:6px 12px; background:var(--dark-brown); color:white; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:bold; transition: 0.3s;"
+                                onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='var(--dark-brown)'"
+                                onclick="selectBranch('Інше', 'Власна адреса на карті', true, ${dynamicPrice}); animateTruckTo(${e.latlng.lat}, ${e.latlng.lng})">
+                            Підтвердити локацію
                         </button>
                     </div>
                 `).openPopup();
