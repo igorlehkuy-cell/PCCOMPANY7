@@ -24,6 +24,15 @@ async function sendTelegramNotification(order, orderData) {
         paymentExtra = `\n🔢 <b>Номер карти:</b> ${orderData.cardNumber}`;
     }
 
+    const deliveryMethodMap = {
+        'courier': 'Кур\\'єрська доставка (За адресою)',
+        'novaposhta': 'Нова Пошта',
+        'ukrposhta': 'Укрпошта',
+        'meest': 'Meest Express',
+        'pickup': 'Самовивіз з магазину'
+    };
+    const deliveryText = deliveryMethodMap[orderData.deliveryMethod] || 'Не вказано';
+
     const message = `
 📦 <b>НОВЕ ЗАМОВЛЕННЯ #${order.id}</b>
     
@@ -31,8 +40,9 @@ async function sendTelegramNotification(order, orderData) {
 📱 <b>Телефон:</b> ${orderData.phone}
 📧 <b>Email:</b> ${orderData.email}
 
-📍 <b>Доставка:</b> ${orderData.location}
-🏠 <b>Адреса:</b> ${orderData.address} ${orderData.apartment ? ' (кв./офіс ' + orderData.apartment + ')' : ''}
+📍 <b>Локація на карті:</b> ${orderData.location}
+🚚 <b>Спосіб доставки:</b> ${deliveryText}
+🏠 <b>Адреса/Відділення:</b> ${orderData.address} ${orderData.apartment ? ' (кв./офіс ' + orderData.apartment + ')' : ''}
 💳 <b>Оплата:</b> ${paymentText}${paymentExtra}
 
 🛒 <b>Товари:</b>
@@ -300,6 +310,7 @@ if (checkoutForm) {
             email: formData.get('email'),
             phone: formData.get('phone'),
             location: formData.get('location'),
+            deliveryMethod: formData.get('deliveryMethod'),
             address: formData.get('address'),
             apartment: formData.get('apartment'),
             postcode: formData.get('postcode'),
