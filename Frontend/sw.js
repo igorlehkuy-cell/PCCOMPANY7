@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pc-company-v1';
+const CACHE_NAME = 'pc-company-v2';
 const urlsToCache = [
   './html/index.html',
   './CSS/styles.css',
