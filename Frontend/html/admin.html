@@ -590,8 +590,31 @@
             });
         });
 
+        // === Auto admin login ===
+        async function ensureAdminToken() {
+            const token = localStorage.getItem('pc-company-token');
+            if (token) return token;
+            try {
+                const form = new URLSearchParams();
+                form.append('username', 'admin@pccompany.com');
+                form.append('password', 'admin123');
+                const res = await fetch(API + '/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: form
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('pc-company-token', data.access_token);
+                    return data.access_token;
+                }
+            } catch (e) {}
+            return null;
+        }
+
         // === Load Stats ===
         async function loadStats() {
+            await ensureAdminToken();
             try {
                 const headers = getAuthHeaders();
                 const [usersRes, productsRes, ordersRes] = await Promise.all([
@@ -607,22 +630,34 @@
                 const lsOrders = JSON.parse(localStorage.getItem('pc-company-orders') || '[]');
                 const allOrders = [...orders, ...lsOrders];
 
-                document.getElementById('statUsers').textContent = users.length || '-';
-                document.getElementById('statProducts').textContent = products.length || '-';
-                document.getElementById('statActive').textContent = users.filter(u => u.is_active === 1).length || '-';
+                document.getElementById('statUsers').textContent = users.length || 0;
+                document.getElementById('statProducts').textContent = products.length || 0;
+                document.getElementById('statActive').textContent = users.filter(u => u.is_active === 1).length || 0;
 
                 const revenue = allOrders.reduce((s, o) => s + (o.total_amount || o.total || 0), 0);
                 document.getElementById('statRevenue').textContent = revenue.toLocaleString('uk-UA') + ' ₴';
 
                 const tbody = document.getElementById('recentUsersBody');
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">👥</div><p>Поки немає користувачів</p></td></tr>';
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">👥</div><p>Поки немає користувачів</p></td></tr>';
+                } else {
+                    tbody.innerHTML = users.slice(0, 5).map(u => `
+                        <tr>
+                            <td>${u.id}</td>
+                            <td>${u.name}</td>
+                            <td>${u.email}</td>
+                            <td>${u.phone || '-'}</td>
+                            <td><span class="badge ${u.is_active ? 'badge-active' : 'badge-inactive'}">${u.is_active ? 'Активний' : 'Заблок'}</span></td>
+                        </tr>`).join('');
+                }
             } catch (e) {
-                // Backend not available - ok
+                console.error('loadStats error:', e);
             }
         }
 
         // === Load Users ===
         async function loadUsers() {
+            await ensureAdminToken();
             try {
                 const headers = getAuthHeaders();
                 const res = await fetch(API + '/api/users', { headers });

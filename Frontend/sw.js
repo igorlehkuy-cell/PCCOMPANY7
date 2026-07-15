@@ -1,46 +1,33 @@
-const CACHE_NAME = 'pc-company-v2';
-const urlsToCache = [
-  './html/index.html',
-  './CSS/styles.css',
-  './JS/script.js',
-  './images/comp.png'
-];
+const CACHE_NAME = 'pc-company-v3';
+const STATIC_CACHE = ['./images/comp.png'];
 
+// Only cache images, never JS/CSS (they must always be fresh)
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
-  );
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).catch(() => {
-          // Fallback for offline if something isn't in cache
-          // (Can return a default offline page here if we had one)
-        });
-      })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_CACHE))
   );
 });
 
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // JS and CSS: always fetch from network (never from cache)
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Images: cache-first
+  event.respondWith(
+    caches.match(event.request).then(cached => cached || fetch(event.request))
   );
 });
