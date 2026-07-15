@@ -500,9 +500,51 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
 }
+
+.cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #e53935;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(229, 57, 53, 0.5);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+    animation: badgePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cart-badge.hidden {
+    opacity: 0;
+    transform: scale(0);
+}
+
+.cart-badge.bump {
+    animation: badgeBump 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes badgePop {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes badgeBump {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}
+
 
 .cart-btn:hover {
     transform: scale(1.15) rotate(-10deg);
@@ -1655,10 +1697,22 @@ html {
     gap: 15px;
     align-items: center;
     padding: 15px;
-    background-color: var(--bg-light);
-    border-radius: 8px;
+    background-color: var(--white);
     border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
+    border-radius: 8px;
+    transition: 0.3s;
+    animation: slideInCart 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slideInCart {
+    from {
+        opacity: 0;
+        transform: translateX(40px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
 }
 
 .cart-item:hover {

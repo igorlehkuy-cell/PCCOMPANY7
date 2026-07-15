@@ -170,13 +170,15 @@ function generateProductCard(product){
   const card = document.createElement('div'); card.className='product-card';
   const gradient = product.type==='desktop' ? 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)' : 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)';
   card.innerHTML = `
-    <div class="product-image-wrapper" style="background:${gradient};">
+    <div class="product-image-wrapper" style="background:${gradient}; position:relative;">
+      <button class="btn-compare-add" data-id="${product.id}" title="Додати до порівняння" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.5); border:none; border-radius:50%; width:35px; height:35px; font-size:18px; cursor:pointer; color:#fff; z-index:2; transition:all 0.3s ease; display:flex; justify-content:center; align-items:center;">⚖️</button>
       <div class="product-image">${product.type==='desktop'?'🖥️':'💻'}</div>
       <div class="price-tag">${formatUSD(product.priceUSD)}</div>
     </div>
     <button class="product-details-btn" data-id="${product.id}">Детальніше</button>
   `;
   card.querySelector('.product-details-btn').addEventListener('click', ()=> openProductModal(product.id));
+  card.querySelector('.btn-compare-add').addEventListener('click', (e)=>{ e.stopPropagation(); toggleCompare(product.id); });
   return card;
 }
 
@@ -400,4 +402,110 @@ function updateCartBadge() {
 
 document.addEventListener('DOMContentLoaded', () => {
     updateCartBadge();
+    updateCompareUI();
 });
+
+// --- Compare Products ---
+let compareList = JSON.parse(localStorage.getItem('pc-company-compare') || '[]');
+
+function toggleCompare(id) {
+    const idx = compareList.indexOf(id);
+    if (idx > -1) {
+        compareList.splice(idx, 1);
+        showToast('Товар видалено з порівняння', 'info');
+    } else {
+        if (compareList.length >= 3) {
+            showToast('Можна порівнювати не більше 3 товарів одночасно!', 'warning');
+            return;
+        }
+        compareList.push(id);
+        showToast('Товар додано до порівняння', 'success');
+    }
+    localStorage.setItem('pc-company-compare', JSON.stringify(compareList));
+    updateCompareUI();
+}
+
+function updateCompareUI() {
+    let bar = document.getElementById('compareFloatingBar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'compareFloatingBar';
+        bar.style.cssText = 'position:fixed; bottom:20px; left:20px; background:var(--card-bg, #fff); color:var(--text-color, #333); padding:15px 20px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:1000; display:none; align-items:center; gap:15px; border:1px solid var(--border-color, #ddd); font-weight:bold; transition:all 0.3s ease;';
+        bar.innerHTML = `
+            <div>⚖️ <span id="compareCountUI" style="color:var(--primary-brown, #8B4513); font-size:1.2em;">0</span> товарів</div>
+            <button id="btnOpenCompareModal" style="background:var(--primary-brown, #8B4513); color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Порівняти</button>
+            <button id="btnClearCompareModal" style="background:#dc3545; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Очистити</button>
+        `;
+        document.body.appendChild(bar);
+        document.getElementById('btnOpenCompareModal').addEventListener('click', openCompareModal);
+        document.getElementById('btnClearCompareModal').addEventListener('click', () => {
+            compareList = [];
+            localStorage.removeItem('pc-company-compare');
+            updateCompareUI();
+            showToast('Список порівняння очищено', 'info');
+        });
+    }
+    const countEl = document.getElementById('compareCountUI');
+    if (countEl) countEl.textContent = compareList.length;
+    bar.style.display = compareList.length > 0 ? 'flex' : 'none';
+
+    document.querySelectorAll('.btn-compare-add').forEach(btn => {
+        const id = Number(btn.dataset.id);
+        if (compareList.includes(id)) {
+            btn.style.background = 'var(--primary-brown, #8B4513)';
+            btn.title = 'Видалити з порівняння';
+        } else {
+            btn.style.background = 'rgba(0,0,0,0.5)';
+            btn.title = 'Додати до порівняння';
+        }
+    });
+}
+
+function openCompareModal() {
+    if (compareList.length === 0) return;
+    let modal = document.getElementById('compareModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'compareModal';
+        modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:2000; overflow-y:auto;';
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeCompareModal(); });
+    }
+
+    let itemsHTML = '';
+    compareList.forEach(id => {
+        const p = products.find(prod => prod.id === id);
+        if (p) {
+            itemsHTML += `
+                <div style="flex:1; min-width:250px; background:var(--card-bg, #fff); padding:20px; border-radius:10px; text-align:center; position:relative; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+                    <button onclick="toggleCompare(${p.id}); closeCompareModal(); if(compareList.length > 0) openCompareModal();" style="position:absolute; top:10px; right:10px; background:transparent; border:none; font-size:20px; cursor:pointer; color:var(--text-color, #333)">&times;</button>
+                    <div style="font-size:40px; margin-bottom:10px;">${p.type === 'desktop' ? '🖥️' : '💻'}</div>
+                    <h3 style="font-size:18px; margin-bottom:10px; color:var(--text-color, #333); height:45px; overflow:hidden;">${p.name}</h3>
+                    <div style="font-size:20px; font-weight:bold; color:var(--primary-brown, #8B4513); margin-bottom:15px;">${formatUSD(p.priceUSD)}</div>
+                    <p style="font-size:14px; color:var(--text-muted, #777); margin-bottom:15px; height:80px; overflow:hidden;">${p.description || ''}</p>
+                    <div style="text-align:left; font-size:14px; background:var(--bg-secondary, #f9f9f9); padding:10px; border-radius:5px; color:var(--text-color, #333);">
+                        ${p.specs && p.specs.length > 0 ? p.specs.map(s => `<div style="padding:5px 0; border-bottom:1px solid var(--border-color, #eee);">${s}</div>`).join('') : 'Немає даних'}
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    modal.innerHTML = `
+        <div style="width:90%; max-width:1000px; background:var(--bg-primary, #f4f4f4); padding:30px; border-radius:15px; max-height:90vh; overflow-y:auto; position:relative;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="color:var(--text-color, #333); margin:0;">⚖️ Порівняння товарів</h2>
+                <button onclick="closeCompareModal()" style="background:transparent; border:none; font-size:28px; cursor:pointer; color:var(--text-color, #333);">&times;</button>
+            </div>
+            <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:stretch;">
+                ${itemsHTML}
+            </div>
+        </div>
+    `;
+    modal.style.display = 'flex';
+}
+
+function closeCompareModal() {
+    const modal = document.getElementById('compareModal');
+    if (modal) modal.style.display = 'none';
+}

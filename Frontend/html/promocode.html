@@ -72,7 +72,7 @@
             }
             
             try {
-                const res = await fetch(`http://127.0.0.1:8000/api/promocodes/check/${promoCode}`);
+                const res = await fetch(`${window.location.origin}/api/promocodes/check/${promoCode}`);
                 if (res.ok) {
                     const data = await res.json();
                     localStorage.setItem('pc-company-promo', data.discount_percent.toString());
